@@ -12,6 +12,8 @@ Giao agent `task-planner` (model sonnet — cần dựng bảng nhánh flow và 
 
 ## Thực thi tuần tự theo task
 
+Plan sinh từ skill [planner](../../../planner/SKILL.md) (`docs/TASKS.md` có heading `## Task N (T-nn)`) thực thi bằng `superpowers:subagent-driven-development`, chạy liên tục và review dồn ở cuối — theo bước 6–7 của skill đó, không theo mục này. Mục này áp dụng cho plan chốt từ Plan Mode không qua skill `planner`.
+
 Giao agent `task-executor` (model sonnet) lặp qua `docs/TASKS.md` theo đúng thứ tự, không nhảy cóc:
 
 1. **Trước mỗi task**: đọc lại `docs/IMPLEMENTATION_PLAN.md` và task hiện tại để xác nhận còn đúng phạm vi đã thống nhất; nếu lệch, xử lý theo "Phân loại thay đổi" trước khi code.

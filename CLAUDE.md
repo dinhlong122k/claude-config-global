@@ -27,4 +27,5 @@ Với feature vừa/lớn trong một software repo, áp dụng skill `planner`:
 - Làm rõ bài toán bằng `superpowers:brainstorming` ở agent chính; design doc đặt ở vị trí mặc định của skill đó.
 - Sau khi người dùng duyệt design, bước kế tiếp là giao agent `task-planner` — **không** dùng `superpowers:writing-plans`. Đây là ưu tiên của người dùng, thay cho hand-off mặc định của brainstorming.
 - Artifact: `docs/IMPLEMENTATION_PLAN.md` (index), `docs/flows/F-*.md`, `docs/TASKS.md`, theo template trong `skills/planner/templates/`.
+- Thực thi bằng `superpowers:subagent-driven-development` với `docs/TASKS.md`, chạy liên tục, review dồn ở cuối; sau đó `plan-reviewer` đối chiếu theo ID và `task-planner` cập nhật plan từ ledger.
 - Khi thực thi một task, chỉ đọc plan index và các flow task đó tham chiếu.

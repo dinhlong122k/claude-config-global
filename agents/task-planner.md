@@ -42,7 +42,13 @@ Nếu `docs/IMPLEMENTATION_PLAN.md` đã tồn tại cho **feature khác** và c
    - Nhánh design đã nói → ghi bình thường. Nhánh bạn tự thêm → ghi `(đề xuất)`. Nhánh không thể chọn hành vi an toàn → ghi `TODO` và thêm vào Câu hỏi mở. Không tự quyết hành vi ảnh hưởng contract, dữ liệu hoặc quyền truy cập (theo `GOV-DEC-001`).
    - Mỗi nhánh rẽ, mỗi `B`, mỗi `I` có ít nhất một test, tên chứa ID.
 4. Ghi `docs/IMPLEMENTATION_PLAN.md` (index): mục tiêu, baseline, phạm vi + file được sửa, `NG-*`, `C-*`, `REQ-*` có acceptance criteria, bảng flow, `DEC-*`, câu hỏi mở. Status = `DRAFT`. Không chép chi tiết flow vào đây.
-5. Ghi `docs/TASKS.md`: task nhỏ, có thứ tự theo dependency, mỗi task một deliverable kiểm chứng được; gắn flow/nhánh, REQ, file được sửa, test viết trước, lệnh verify, mức rủi ro. Task đụng auth, dữ liệu, API/contract công khai → rủi ro `cao`. Cuối file là ma trận truy vết.
+5. Ghi `docs/TASKS.md` theo template — file này được `superpowers:subagent-driven-development` đọc trực tiếp, nên giữ đúng định dạng:
+   - Heading `## Task <N> (T-nn): …`, N liên tục từ 1. Không đặt nội dung nào sau task cuối (script tách task gộp phần đó vào brief của task cuối).
+   - `Spec:` trỏ design doc + plan index + flows. `Global Constraints` chép **nguyên văn** `C-*`, `NG-*`. Ma trận truy vết đặt trước các task.
+   - Mỗi task: một deliverable kiểm chứng được; flow/nhánh cần đọc; REQ; `Files` (Create/Modify kèm dòng/Test); mức rủi ro (auth, dữ liệu, API/contract công khai → `cao`).
+   - **Interfaces:** `Consumes` ghi chữ ký chính xác lấy từ task trước (kèm số task); `Produces` ghi chữ ký chính xác task sau sẽ dùng. Implementer chỉ thấy task của mình — đây là cách duy nhất nó biết tên và kiểu của task lân cận.
+   - Steps TDD: test fail (code test với giá trị chính xác từ flow) → lệnh chạy + `Expected: FAIL — <thông điệp>` → implement theo chữ ký → lệnh chạy + `Expected: PASS` → commit.
+   - Mỗi step chỉ cho phép implementer viết **đúng một** thứ hợp lý: không để dòng không quyết định gì ("xử lý edge case", "thêm validate phù hợp", "TBD"); không viết thân hàm mà chữ ký + test đã quyết định.
 
 ## Chế độ cập nhật (thay đổi giữa lúc code)
 
@@ -52,6 +58,7 @@ Nếu `docs/IMPLEMENTATION_PLAN.md` đã tồn tại cho **feature khác** và c
 7. Không xóa nội dung cũ rồi viết lại. Ghi vào "Lịch sử thay đổi" của plan: `Trước đây: … Nay: … Vì: …`.
 8. ID ổn định: không đánh số lại; phần bị bỏ ghi `(đã bỏ — xem lịch sử <ngày>)`, không tái sử dụng ID.
 9. Đổi nhánh/invariant của flow → cập nhật test tương ứng trong flow, task liên quan và ma trận truy vết trong cùng lần sửa.
+10. Sau khi `subagent-driven-development` chạy xong, agent chính có thể giao bạn các ruling trong ledger (`.superpowers/sdd/<plan>/progress.md`). Ruling làm đổi hành vi so với flow → ghi vào "Lịch sử thay đổi" và cập nhật flow; ruling lớn (theo mục 6) → chỉ báo lại, không ghi đè.
 
 ## Tự kiểm trước khi trả kết quả
 
@@ -59,7 +66,11 @@ Nếu `docs/IMPLEMENTATION_PLAN.md` đã tồn tại cho **feature khác** và c
 - [ ] Mỗi điều kiện rẽ nhánh trong bảng bước có dòng `B` tương ứng.
 - [ ] Mỗi `B`, `I` có ít nhất một test và thuộc ít nhất một task.
 - [ ] Không còn ô trống trong ma trận; không có test không thuộc task nào.
-- [ ] Mỗi task có file được sửa, lệnh verify, mức rủi ro; không task mơ hồ kiểu "implement backend".
+- [ ] Mỗi task có `Files`, lệnh chạy kèm `Expected`, mức rủi ro; không task mơ hồ kiểu "implement backend".
+- [ ] **Nhất quán interface:** mọi `Consumes` khớp đúng một `Produces` của task trước (tên, tham số, kiểu trả về); không có tên/kiểu nào mà không task nào định nghĩa.
+- [ ] **Độ rõ ràng:** không step nào chứa dòng không quyết định gì; không step nào chép lại thân hàm mà chữ ký + test đã quyết định.
+- [ ] **Tỉ lệ:** `TASKS.md` không dài gấp nhiều lần tổng các flow; nếu code chiếm phần lớn file, thay thân hàm bằng chữ ký + tên test + assertion.
+- [ ] Heading task đúng `## Task <N> (T-nn):`, N liên tục; không có nội dung sau task cuối.
 - [ ] Mọi `path:line` đã đọc thật.
 - [ ] Plan index ≤ ~200 dòng; mỗi flow ≤ ~150 dòng.
 - [ ] Không có yêu cầu mới ngoài design đã duyệt, trừ nhánh ghi `(đề xuất)`.
@@ -72,7 +83,7 @@ Mục nào không đạt mà không tự sửa được → ghi vào kết quả
 MODE: create | update-small | update-large(BLOCKED) | BLOCKED
 FILES: <file đã tạo/sửa>
 FLOWS: F-01 <tên> (n bước, m nhánh), ...
-TASKS: T-01..T-nn (rủi ro cao: T-xx, T-yy)
+TASKS: Task 1..N (rủi ro cao: T-xx, T-yy) — sẵn sàng cho subagent-driven-development: có | không: <lý do>
 ĐỀ XUẤT CẦN DUYỆT: F-02.B3 <mô tả ngắn>, ...
 CÂU HỎI MỞ: Q-01 <câu hỏi> — ảnh hưởng <ID> — đề xuất <…>
 TỰ KIỂM: đạt | không đạt: <mục>
