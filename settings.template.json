@@ -1,0 +1,31 @@
+{
+  "permissions": { "allow": ["mcp__codegraph__*"] },
+  "model": "sonnet",
+  "modelSettings": {
+    "claude-sonnet-5-5": { "effortLevel": "medium" },
+    "claude-opus-5-5": { "effortLevel": "low" },
+    "claude-sonnet-5": { "effortLevel": "low" },
+    "claude-opus-5": { "effortLevel": "low" }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "caveman@anthropic-plugin-directory": true
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "node \"__CLAUDE_HOME__/hooks/caveman-on.js\"", "timeout": 5 } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "codegraph prompt-hook" } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "Write|Edit",
+        "hooks": [ { "type": "command", "command": "node \"__CLAUDE_HOME__/hooks/sync-back.js\"", "timeout": 10 } ] }
+    ],
+    "PreToolUse": [
+      { "matcher": "Grep|Glob|Read|Bash|mcp__codegraph__codegraph_explore",
+        "hooks": [ { "type": "command", "command": "node \"__CLAUDE_HOME__/hooks/codegraph-gate.js\"", "timeout": 10 } ] }
+    ]
+  }
+}

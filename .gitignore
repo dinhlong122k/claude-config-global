@@ -1,0 +1,7 @@
+*.bak*
+*.bak-*
+.global-config-repo
+node_modules/
+.env
+*.log
+Thumbs.db
