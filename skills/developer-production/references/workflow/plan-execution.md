@@ -4,9 +4,9 @@
 
 ## Chốt plan thành artifact
 
-Giao agent `task-planner` (model haiku — việc ghi lại nội dung đã thống nhất là cơ học, không cần suy luận sâu):
+Giao agent `task-planner` (model sonnet — cần dựng bảng nhánh flow và phát hiện nhánh thiếu, không chỉ chép lại). Quy trình đầy đủ (brainstorming → cổng duyệt → task-planner) và template thuộc skill [planner](../../../planner/SKILL.md):
 
-1. Ghi/cập nhật `docs/IMPLEMENTATION_PLAN.md` đúng theo nội dung đã chốt trong Plan Mode — không tự thêm hoặc suy diễn yêu cầu mới.
+1. Ghi/cập nhật `docs/IMPLEMENTATION_PLAN.md` (index) và `docs/flows/F-*.md` đúng theo design đã duyệt (từ `superpowers:brainstorming` hoặc Plan Mode) — không tự thêm hoặc suy diễn yêu cầu mới; nhánh tự bổ sung phải ghi `(đề xuất)`.
 2. Tạo/cập nhật `docs/TASKS.md`: danh sách task rời rạc, có thứ tự, mỗi task có ID ổn định (`T-...`), mục tiêu, file/module dự kiến, dependency, và tiêu chí "done" kiểm chứng được (test pass, build pass, hành vi quan sát được cụ thể). Task đủ nhỏ để review riêng lẻ.
 3. Nếu plan/task đã tồn tại, không ghi đè nội dung cũ — xem mục "Giữ lịch sử quyết định" dưới đây.
 

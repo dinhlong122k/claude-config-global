@@ -19,3 +19,12 @@ Nếu repo có `.codegraph/`, các quy tắc sau áp dụng MẶC ĐỊNH, khôn
 - Chỉ Read/Grep trực tiếp khi: file không được index (config, docs, yml, properties), hoặc cần chi tiết codegraph chưa trả về, hoặc file vừa sửa trong session này (index lag ~1s).
 - Tool bị deferred → load bằng ToolSearch `select:mcp__codegraph__codegraph_explore` rồi gọi, không bỏ qua.
 - Không spawn subagent chỉ để tìm/đọc code — codegraph đã làm việc đó.
+
+## Planning — brainstorming → template
+
+Với feature vừa/lớn trong một software repo, áp dụng skill `planner`:
+
+- Làm rõ bài toán bằng `superpowers:brainstorming` ở agent chính; design doc đặt ở vị trí mặc định của skill đó.
+- Sau khi người dùng duyệt design, bước kế tiếp là giao agent `task-planner` — **không** dùng `superpowers:writing-plans`. Đây là ưu tiên của người dùng, thay cho hand-off mặc định của brainstorming.
+- Artifact: `docs/IMPLEMENTATION_PLAN.md` (index), `docs/flows/F-*.md`, `docs/TASKS.md`, theo template trong `skills/planner/templates/`.
+- Khi thực thi một task, chỉ đọc plan index và các flow task đó tham chiếu.
