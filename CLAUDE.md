@@ -8,24 +8,53 @@ In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the re
 
 If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
 <!-- CODEGRAPH_END -->
-
 ## CodeGraph — bắt buộc dùng tự động
 
-Nếu repo có `.codegraph/`, các quy tắc sau áp dụng MẶC ĐỊNH, không cần user nhắc:
+Bổ sung cho block trên (block đó do `codegraph` CLI quản lý, không sửa tay). Khi repo có `.codegraph/`, áp dụng mặc định:
 
-- Mọi câu hỏi về code (how/where/why, flow, bug, impact) → gọi `codegraph_explore` TRƯỚC. Không grep/Glob/Read để khám phá khi chưa gọi nó.
-- Trước khi sửa code → gọi `codegraph_explore` với tên symbol/file sắp sửa để xem source + blast radius, rồi mới Edit.
+- Mọi câu hỏi về code (how/where/why, flow, bug, impact) và trước khi sửa code: gọi `codegraph_explore` TRƯỚC với tên symbol/file để xem source và blast radius. Không grep/Glob/Read để khám phá khi chưa gọi nó. Tool bị deferred → load bằng ToolSearch `select:mcp__codegraph__codegraph_explore`; không có MCP → dùng shell.
 - Tin kết quả codegraph, không grep lại để kiểm chứng.
-- Chỉ Read/Grep trực tiếp khi: file không được index (config, docs, yml, properties), hoặc cần chi tiết codegraph chưa trả về, hoặc file vừa sửa trong session này (index lag ~1s).
-- Tool bị deferred → load bằng ToolSearch `select:mcp__codegraph__codegraph_explore` rồi gọi, không bỏ qua.
-- Không spawn subagent chỉ để tìm/đọc code — codegraph đã làm việc đó.
+- Read/Grep trực tiếp chỉ khi: file không được index (config, docs, yml, properties), cần chi tiết codegraph chưa trả về, hoặc file vừa sửa trong session (index lag ~1s).
+- Không spawn subagent chỉ để tìm/đọc code.
+
+## Điều phối agent — chia để trị
+
+Ba tầng, mỗi tầng một trách nhiệm. Không tầng nào làm thay việc của tầng khác.
+
+| Tầng | Chứa | Không chứa |
+| --- | --- | --- |
+| Plan/task (`docs/IMPLEMENTATION_PLAN.md`, `docs/flows/`, `docs/TASKS.md`) | Làm gì: mục tiêu, phạm vi, acceptance criteria, file, test | Tên skill, tên agent, cách code |
+| Agent (`agents/`) | Vai trò, quy trình, skill cần nạp (`skills:`), output contract | Rule kỹ thuật chi tiết |
+| Skill (`skills/`) | Rule kỹ thuật theo miền, nạp theo trigger | Ai dispatch ai, khi nào hỏi người dùng |
+
+Agent chính là orchestrator: chọn agent theo bảng dưới, gom kết quả, và là nơi **duy nhất** hỏi người dùng. Subagent không hỏi người dùng; câu hỏi và blocker trả về trong report.
+
+| Ý định | Agent |
+| --- | --- |
+| Triển khai code theo plan/task file | `task-executor` |
+| Chuyển design đã duyệt thành plan, cập nhật plan | `task-planner` |
+| Review/refactor không đổi hành vi | `code-reviewer` |
+| Review bảo mật | `security-reviewer` |
+| Đối chiếu plan ↔ code theo ID | `plan-reviewer` |
+| Tìm vị trí code (repo không có `.codegraph/`) | `explorer` |
+
+### Thực thi plan
+
+Khi người dùng đưa file plan/task và yêu cầu triển khai:
+
+1. Không yêu cầu task nhắc skill. `task-executor` tự nạp `developer-production` và stack adapter theo manifest của repo.
+2. `docs/TASKS.md` theo template `planner` (heading `## Task N (T-nn)`): chạy `superpowers:subagent-driven-development`, nhưng **implementer dispatch bằng `subagent_type: task-executor`** thay cho `general-purpose`. Đây là ưu tiên của người dùng, ghi đè template implementer của skill đó. Không có skill đó, hoặc file task dạng khác: dispatch `task-executor` lần lượt từng task (một subagent một task, không song song).
+3. Chạy liên tục, không dừng giữa task kể cả task rủi ro cao. Review dồn ở cuối:
+   - `security-reviewer` trên diff toàn nhánh, và `plan-reviewer` đối chiếu theo ID.
+   - `code-reviewer` (chế độ chỉ review) khi không chạy qua `subagent-driven-development`, vì skill đó đã review chất lượng từng task.
+4. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm commit, giả định/ruling, check chưa chạy.
 
 ## Planning — brainstorming → template
 
-Với feature vừa/lớn trong một software repo, áp dụng skill `planner`:
+Feature vừa/lớn (nhiều flow, hoặc đụng dữ liệu/API/auth) trong software repo: áp dụng skill `planner`. Sửa nhỏ 1–2 file rõ ràng: làm thẳng.
 
 - Làm rõ bài toán bằng `superpowers:brainstorming` ở agent chính; design doc đặt ở vị trí mặc định của skill đó.
-- Sau khi người dùng duyệt design, bước kế tiếp là giao agent `task-planner` — **không** dùng `superpowers:writing-plans`. Đây là ưu tiên của người dùng, thay cho hand-off mặc định của brainstorming.
+- Sau khi người dùng duyệt design, giao `task-planner` — **không** dùng `superpowers:writing-plans`. Đây là ưu tiên của người dùng, thay cho hand-off mặc định của brainstorming.
 - Artifact: `docs/IMPLEMENTATION_PLAN.md` (index), `docs/flows/F-*.md`, `docs/TASKS.md`, theo template trong `skills/planner/templates/`.
-- Thực thi bằng `superpowers:subagent-driven-development` với `docs/TASKS.md`, chạy liên tục, review dồn ở cuối; sau đó `plan-reviewer` đối chiếu theo ID và `task-planner` cập nhật plan từ ledger.
+- Thực thi theo mục "Thực thi plan"; sau đó `task-planner` cập nhật plan từ ledger.
 - Khi thực thi một task, chỉ đọc plan index và các flow task đó tham chiếu.

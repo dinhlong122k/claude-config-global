@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer
 description: Read-only reviewer đối chiếu luồng implementation đã thay đổi với docs/IMPLEMENTATION_PLAN.md. Dùng sau một nhóm thay đổi logic nhất quán và trước khi kết thúc task, để xác nhận plan vẫn khớp với code thực tế.
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, mcp__codegraph__codegraph_explore
 model: sonnet
 ---
 

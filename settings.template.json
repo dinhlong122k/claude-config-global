@@ -26,6 +26,14 @@
     "PreToolUse": [
       { "matcher": "Grep|Glob|Read|Bash|mcp__codegraph__codegraph_explore",
         "hooks": [ { "type": "command", "command": "node \"__CLAUDE_HOME__/hooks/codegraph-gate.js\"", "timeout": 10 } ] }
+    ],
+    "SubagentStart": [
+      { "matcher": "task-executor",
+        "hooks": [ { "type": "command", "command": "node \"__CLAUDE_HOME__/hooks/verify-on-stop.js\"", "timeout": 10 } ] }
+    ],
+    "SubagentStop": [
+      { "matcher": "task-executor",
+        "hooks": [ { "type": "command", "command": "node \"__CLAUDE_HOME__/hooks/verify-on-stop.js\"", "timeout": 30 } ] }
     ]
   }
 }

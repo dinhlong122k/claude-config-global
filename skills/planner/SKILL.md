@@ -26,7 +26,7 @@ Skill này chạy ở **agent chính**: chỉ agent chính hội thoại đượ
    - `BLOCKED` → làm theo lý do trả về (thường là quay lại bước 1).
    - Còn mục trong "Câu hỏi mở" hoặc nhánh `TODO` trong flow → đưa người dùng trong **một** tin nhắn, quan trọng trước; cập nhật bằng cách giao lại `task-planner`.
 5. **Cổng 2 — duyệt plan.** Đưa người dùng: danh sách flow, nhánh/invariant mà `task-planner` tự bổ sung (đánh dấu "đề xuất"), và các task rủi ro cao. Người dùng nên dồn thời gian review vào bảng nhánh của flow, không phải task. Đây là cổng duyệt **cuối cùng trước khi code** — sau cổng này thực thi chạy liên tục.
-6. **Thực thi** — invoke `superpowers:subagent-driven-development` với `PLAN_FILE = docs/TASKS.md` (không có subagent tool → `superpowers:executing-plans`).
+6. **Thực thi** — theo mục "Thực thi plan" trong `CLAUDE.md`: invoke `superpowers:subagent-driven-development` với `PLAN_FILE = docs/TASKS.md`, implementer là agent `task-executor` (nạp sẵn `developer-production`). Không có subagent tool → `superpowers:executing-plans` và agent chính tự áp dụng `developer-production`.
    - Chạy liên tục, không dừng giữa các task, kể cả task rủi ro cao; review dồn ở cuối (review toàn branch của skill đó). Đây là lựa chọn đã chốt của người dùng.
    - Mỗi implementer chỉ nhận brief của task mình; brief trỏ tới đúng flow/nhánh cần đọc, không nạp toàn bộ `docs/flows/`.
    - Mâu thuẫn giữa task và flow: skill tự phân xử với spec làm chuẩn và ghi ruling vào ledger — không dừng hỏi.

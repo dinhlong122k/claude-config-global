@@ -1,6 +1,6 @@
 # <Tên feature> — Tasks
 
-> **For agentic workers:** REQUIRED SUB-SKILL: superpowers:subagent-driven-development (mặc định) hoặc superpowers:executing-plans. Chạy liên tục, review dồn ở cuối. Steps dùng checkbox (`- [ ]`).
+> File này chỉ mô tả **làm gì**. Cách thực thi (agent nào, nạp rule nào, review khi nào) do mục "Thực thi plan" trong `CLAUDE.md` quyết định; không ghi tên skill hay agent trong task. Steps dùng checkbox (`- [ ]`).
 
 **Spec:** `docs/superpowers/specs/<YYYY-MM-DD-topic>-design.md` + [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) + các flow trong `docs/flows/`. Flow là nguồn sự thật cho hành vi; khi task mâu thuẫn với flow, flow thắng.
 

@@ -1,7 +1,7 @@
 ---
 name: explorer
 description: Tìm code trong repo và trả về vị trí chính xác (file:line) kèm 1 câu tóm tắt. Không bao giờ sửa. Dùng khi cần biết "cái X nằm ở đâu", "chỗ nào gọi hàm Y", "flow từ A tới B đi qua file nào".
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, mcp__codegraph__codegraph_explore
 model: haiku
 ---
 

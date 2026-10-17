@@ -6,6 +6,7 @@ const os = require('os');
 const path = require('path');
 
 const EXPLORE = 'mcp__codegraph__codegraph_explore';
+const SHELL_EXPLORE = /(^|[|;&]\s*)codegraph\s+explore\b/;
 const NON_CODE = new Set([
   '.md', '.txt', '.json', '.yml', '.yaml', '.xml', '.properties', '.toml',
   '.ini', '.env', '.csv', '.log', '.lock', '.gradle', '.sql', '.html', '.css',
@@ -50,7 +51,10 @@ process.stdin.on('end', () => {
   const dir = path.join(os.tmpdir(), 'claude-codegraph-gate');
   const marker = path.join(dir, sid);
 
-  if (tool === EXPLORE) {
+  // Shell explore counts too: agents with an explicit `tools:` list may lack the MCP tool,
+  // and CLAUDE.md promises the shell form always works.
+  const shellExplore = tool === 'Bash' && SHELL_EXPLORE.test(String(ti.command || ''));
+  if (tool === EXPLORE || shellExplore) {
     try {
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(marker, String(Date.now()));
@@ -77,7 +81,8 @@ process.stdin.on('end', () => {
     deny(
       'CodeGraph gate: repo has .codegraph/. Call mcp__codegraph__codegraph_explore ' +
       'FIRST (load via ToolSearch "select:mcp__codegraph__codegraph_explore" if deferred), ' +
-      'then retry. After one explore call this gate opens for the session.'
+      'or run `codegraph explore "<symbol or question>"` via Bash, then retry. ' +
+      'After one explore call this gate opens for the session.'
     );
   }
   process.exit(0);
