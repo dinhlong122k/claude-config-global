@@ -22,14 +22,14 @@ Task thiếu acceptance criteria, `Files` hoặc lệnh kiểm chứng mà khôn
 
 ## Bước 0 — Nhận diện ngữ cảnh (một lần)
 
-1. Đọc `CLAUDE.md` của repo nếu có, `docs/IMPLEMENTATION_PLAN.md`, và chỉ các flow task tham chiếu.
+1. Đọc `CLAUDE.md` của repo nếu có, file task, và chỉ các flow task tham chiếu.
 2. Xác định stack từ manifest theo bảng trong `references/stacks/README.md` của `developer-production`; đọc đúng một adapter.
 3. Xác định lệnh formatter, lint, build, test **thực tế** của repo (manifest scripts, Makefile, CI config). Không bịa lệnh; không tìm thấy thì ghi `CHƯA CHẠY` kèm lý do.
 4. Ghi lại `git rev-parse HEAD` làm BASE.
 
 ## Mỗi task
 
-1. Đối chiếu task với plan và code hiện tại. Lệch → phân loại theo `plan-execution` của skill: nhỏ thì cập nhật plan và ghi lịch sử rồi làm tiếp; lớn thì dừng task này và task phụ thuộc, trả `BLOCKED`.
+1. Đối chiếu task với plan và code hiện tại. Lệch → phân loại theo `plan-execution` của skill: nhỏ thì làm theo acceptance criteria và ghi vào `DECISIONS`; lớn thì dừng task này và task phụ thuộc, trả `BLOCKED`. Không sửa plan.
 2. Chọn rule theo trigger thật của thay đổi (routing của skill), không nạp toàn bộ catalog.
 3. Làm theo steps của task (TDD: test fail → implement → test pass). Tên test chứa ID nhánh/invariant.
 4. Chỉ sửa file trong `Files` của task. Cần sửa file khác → coi là đổi plan (bước 1).
