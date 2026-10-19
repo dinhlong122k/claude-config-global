@@ -39,7 +39,8 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 **Quy mô:** XS | S | M — L trở lên (> 5 file) phải tách
 **Rủi ro:** cao (auth / dữ liệu / API–contract công khai) | thường
 **Phase:** <1 Nền | 2 … >
-**Flow / nhánh:** F-01.S1–S3, F-01.B1 — đọc `docs/flows/F-01-<slug>.md`, chỉ các dòng này
+**Boundary:** <stack> · <từng trigger> · <từng integration> — tên nguyên văn theo bảng routing/stack/integration, ví dụ `Java/Spring · API/HTTP · Database write, nhiều store · Kafka`
+**Flow / nhánh:** F-01.S1–S3, F-01.B1 — đọc `docs/flows/F-01-<slug>.md`: Bối cảnh, Concurrency & retry, Observability và các dòng này
 **Requirements:** REQ-001
 **Phụ thuộc:** — | Task N
 
@@ -52,6 +53,7 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 - Modify: `exact/path/existing.ext:120-145`
 - Modify: `exact/path/routes.ext` — chia sẻ với T-02, chỉ `<symbol>` (chỉ khi không tránh được; phải có `Phụ thuộc`)
 - Test: `tests/exact/path/test_file.ext`
+- Docs: `README.md#<mục>` / `docs/api/openapi.yaml` / `CHANGELOG.md` (entry riêng) — <nội dung phải đổi> | — (không đổi bề mặt: <lý do>)
 
 **Interfaces:**
 - Consumes: <tên + chữ ký chính xác từ task trước, ví dụ `OrderRepository.findForUpdate(id: OrderId): Order | null` (Task 1)> | —
@@ -60,6 +62,7 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 **Verification** (task chỉ xong khi mọi dòng đạt; lệnh thật của repo):
 - Test: `<lệnh chạy test của task>` → PASS
 - Lint/build: `<lệnh>` → PASS | CHƯA XÁC ĐỊNH: <lý do>
+- Docs: `<file#mục>` khớp <chữ ký / giá trị / lệnh cụ thể>; lệnh lint doc nếu repo có | —
 - Manual: <việc kiểm bằng tay, nếu có> | —
 
 - [ ] **Step 1: Viết test fail cho F-01.B1**
@@ -83,14 +86,18 @@ Expected: FAIL — <thông điệp mong đợi, ví dụ "function not defined">
 Run: `<lệnh>`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Cập nhật Docs (bỏ nếu `Docs: —`)**
+
+<file#mục — nội dung chính xác cần thêm/sửa, lấy từ chữ ký và giá trị của task>
+
+- [ ] **Step 6: Commit** (code + test + doc cùng commit)
 
 ```bash
 git add <files>
 git commit -m "<type>: <mô tả> (T-01, F-01.B1)"
 ```
 
-- [ ] **Step 6: Checkpoint phase <tên> (chỉ task cuối phase — bỏ step này ở task khác)**
+- [ ] **Step 7: Checkpoint phase <tên> (chỉ task cuối phase — bỏ step này ở task khác)**
 
 Run: `<lệnh full test của repo>` và `<lệnh build>`
 Expected: PASS — mọi flow của phase chạy end-to-end
