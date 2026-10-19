@@ -41,10 +41,3 @@ Khi người dùng đưa file plan/task và yêu cầu triển khai:
    - `security-reviewer` trên diff toàn nhánh, và `plan-reviewer` đối chiếu theo ID.
    - `code-reviewer` (chế độ chỉ review) khi không chạy qua `subagent-driven-development`, vì skill đó đã review chất lượng từng task.
 3. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm commit, giả định/ruling, check chưa chạy.
-4. Sau cùng, giao `task-planner` (chế độ cập nhật) các ruling trong ledger để cập nhật plan.
-
-## Planning — brainstorming → template
-
-Feature vừa/lớn (nhiều flow, hoặc đụng dữ liệu/API/auth) trong software repo: áp dụng skill `planner` (quy trình, artifact, template nằm ở đó). Sửa nhỏ 1–2 file rõ ràng: làm thẳng.
-
-Sau khi người dùng duyệt design từ `superpowers:brainstorming`, giao `task-planner` — **không** dùng `superpowers:writing-plans`. Đây là ưu tiên của người dùng, thay cho hand-off mặc định của brainstorming.
