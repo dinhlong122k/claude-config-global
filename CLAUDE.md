@@ -19,13 +19,7 @@ Bổ sung cho block trên (block đó do `codegraph` CLI quản lý, không sử
 
 ## Điều phối agent — chia để trị
 
-Ba tầng, mỗi tầng một trách nhiệm. Không tầng nào làm thay việc của tầng khác.
-
-| Tầng | Chứa | Không chứa |
-| --- | --- | --- |
-| Plan/task (`docs/IMPLEMENTATION_PLAN.md`, `docs/flows/`, `docs/TASKS.md`) | Làm gì: mục tiêu, phạm vi, acceptance criteria, file, test | Tên skill, tên agent, cách code |
-| Agent (`agents/`) | Vai trò, quy trình, skill cần nạp (`skills:`), output contract | Rule kỹ thuật chi tiết |
-| Skill (`skills/`) | Rule kỹ thuật theo miền, nạp theo trigger | Ai dispatch ai, khi nào hỏi người dùng |
+Ba tầng plan/task → agent → skill, mỗi tầng một trách nhiệm (bảng ở `README.md`). Plan/task chỉ nói làm gì (mục tiêu, phạm vi, acceptance criteria, file, test), không nêu tên skill/agent hay cách code.
 
 Agent chính là orchestrator: chọn agent theo bảng dưới, gom kết quả, và là nơi **duy nhất** hỏi người dùng. Subagent không hỏi người dùng; câu hỏi và blocker trả về trong report.
 
@@ -42,19 +36,8 @@ Agent chính là orchestrator: chọn agent theo bảng dưới, gom kết quả
 
 Khi người dùng đưa file plan/task và yêu cầu triển khai:
 
-1. Không yêu cầu task nhắc skill. `task-executor` tự nạp `developer-production` và stack adapter theo manifest của repo.
-2. `docs/TASKS.md` theo template `planner` (heading `## Task N (T-nn)`): chạy `superpowers:subagent-driven-development`, nhưng **implementer dispatch bằng `subagent_type: task-executor`** thay cho `general-purpose`. Đây là ưu tiên của người dùng, ghi đè template implementer của skill đó. Không có skill đó, hoặc file task dạng khác: dispatch `task-executor` lần lượt từng task (một subagent một task, không song song).
-3. Chạy liên tục, không dừng giữa task kể cả task rủi ro cao. Review dồn ở cuối:
+1. `docs/TASKS.md` theo template `planner` (heading `## Task N (T-nn)`): chạy `superpowers:subagent-driven-development`, nhưng **implementer dispatch bằng `subagent_type: task-executor`** thay cho `general-purpose`. Đây là ưu tiên của người dùng, ghi đè template implementer của skill đó. Không có skill đó, hoặc file task dạng khác: dispatch `task-executor` lần lượt từng task (một subagent một task, không song song).
+2. Chạy liên tục, không dừng giữa task kể cả task rủi ro cao, trừ khi `task-executor` trả `BLOCKED` hoặc `NEEDS_CONTEXT`. Review dồn ở cuối:
    - `security-reviewer` trên diff toàn nhánh, và `plan-reviewer` đối chiếu theo ID.
    - `code-reviewer` (chế độ chỉ review) khi không chạy qua `subagent-driven-development`, vì skill đó đã review chất lượng từng task.
-4. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm commit, giả định/ruling, check chưa chạy.
-
-## Planning — brainstorming → template
-
-Feature vừa/lớn (nhiều flow, hoặc đụng dữ liệu/API/auth) trong software repo: áp dụng skill `planner`. Sửa nhỏ 1–2 file rõ ràng: làm thẳng.
-
-- Làm rõ bài toán bằng `superpowers:brainstorming` ở agent chính; design doc đặt ở vị trí mặc định của skill đó.
-- Sau khi người dùng duyệt design, giao `task-planner` — **không** dùng `superpowers:writing-plans`. Đây là ưu tiên của người dùng, thay cho hand-off mặc định của brainstorming.
-- Artifact: `docs/IMPLEMENTATION_PLAN.md` (index), `docs/flows/F-*.md`, `docs/TASKS.md`, theo template trong `skills/planner/templates/`.
-- Thực thi theo mục "Thực thi plan"; sau đó `task-planner` cập nhật plan từ ledger.
-- Khi thực thi một task, chỉ đọc plan index và các flow task đó tham chiếu.
+3. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm commit, giả định/ruling, check chưa chạy.
