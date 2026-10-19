@@ -17,6 +17,8 @@ Template (đọc trước khi ghi, dùng đúng cấu trúc):
 
 Quy ước ID và giới hạn kích thước: xem [skill planner](../skills/planner/SKILL.md).
 
+Từ vựng `Boundary` (chỉ đọc các bảng, không đọc rule bên dưới): cột Trigger của [routing](../skills/developer-production/references/routing.md), bảng [stack](../skills/developer-production/references/stacks/README.md), bảng [integration](../skills/developer-production/references/integrations/README.md).
+
 ## Mục tiêu cuối
 
 Đích của mỗi lần chạy: agent thực thi không có lịch sử hội thoại vẫn làm đúng từng task, và mỗi hành vi trong design được chứng minh bằng một test hoặc lệnh cụ thể. Ghi xong file mà chưa đạt đích này là chưa xong. Mọi quyết định trong lúc lập plan phải phục vụ đích này; việc không phục vụ thì bỏ.
@@ -28,6 +30,17 @@ Trước khi ghi task, chuyển từng mục của design thành đích kiểm c
 - "Refactor X" → test hiện có pass trước và sau; liệt kê test đó ở "Hành vi hiện có phải bảo toàn".
 - `Goal:` trong `TASKS.md` và `Mục tiêu:` của mỗi task là một câu nêu kết quả quan sát được, không phải "triển khai X".
 - Tiêu chí yếu ("chạy được", "hoạt động đúng", "xử lý phù hợp") không được vào REQ, acceptance criteria hay Step. Không đổi được thành lệnh hoặc quan sát cụ thể → ghi vào Câu hỏi mở.
+
+Văn phong đặc tả: câu mệnh lệnh, một thuật ngữ cho một khái niệm, giá trị cụ thể. Không giải thích hay lập luận trong task hoặc flow; lý do ghi vào `DEC-*`.
+
+## Tài liệu là một phần sản phẩm
+
+Doc sai hoặc thiếu là bug. Task đổi thứ developer khác dùng tới mà không cập nhật doc là task chưa xong.
+
+- **Bề mặt cần doc:** API/event contract, error code, config/env var, lệnh CLI/script, bước setup/migration/rollback, hành vi mà README hoặc doc hiện có đang mô tả. Doc comment trong code không thuộc mục này.
+- **Vị trí:** theo convention đã thấy ở baseline (README, `docs/`, OpenAPI/AsyncAPI, CHANGELOG, ADR). Không tạo hệ thống doc mới; không có chỗ → README gần module nhất.
+- **Doc đi cùng task đổi hành vi đó**, không gom thành task "viết doc" cuối. File doc theo quy tắc sở hữu file; file chỉ thêm cuối (CHANGELOG) mỗi task thêm entry riêng, không tính là chia sẻ.
+- Mỗi task: `Docs:` trong `Files` + một dòng `Verification` ghi file#mục và nội dung phải khớp (chữ ký, giá trị, lệnh). Không đổi bề mặt → `Docs: — (không đổi bề mặt: <lý do>)`.
 
 ## Cổng đầu vào — kiểm tra trước mọi việc
 
@@ -59,7 +72,7 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
 ## Chế độ tạo mới
 
 1. Đọc 3 template và toàn bộ design doc.
-2. Đọc baseline: các `path:line` mà agent chính truyền vào hoặc design nhắc tới, cộng phần code tối thiểu để xác định entry point, pattern cần tái dùng, test hiện có, danh sách file được sửa và cấu trúc thư mục vùng thay đổi (theo `ARC-STR-001`) — đây là đầu vào để cắt dọc. Không khảo sát lan rộng; không bịa file.
+2. Đọc baseline: các `path:line` mà agent chính truyền vào hoặc design nhắc tới, cộng phần code tối thiểu để xác định entry point, pattern cần tái dùng, test hiện có, danh sách file được sửa, cấu trúc thư mục vùng thay đổi (theo `ARC-STR-001`) — đầu vào để cắt dọc, stack theo manifest (bảng stack), và vị trí doc hiện có. Không khảo sát lan rộng; không bịa file.
 3. Tách flow: mỗi trigger/use case độc lập là một `F-nn`. Ghi `docs/flows/F-nn-<slug>.md` theo template.
    - Liệt kê đủ nhánh cho từng bước. Với mỗi bước, xét các nhánh **có liên quan thật**: input sai, không tìm thấy, không đủ quyền, gọi trùng/replay, đồng thời, phụ thuộc ngoài lỗi/timeout, thất bại giữa chừng.
    - Nhánh design đã nói → ghi bình thường. Nhánh bạn tự thêm → ghi `(đề xuất)`. Nhánh không thể chọn hành vi an toàn → ghi `TODO` và thêm vào Câu hỏi mở. Không tự quyết hành vi ảnh hưởng contract, dữ liệu hoặc quyền truy cập (theo `GOV-DEC-001`).
@@ -69,6 +82,8 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
 6. Ghi `docs/TASKS.md` theo template, đủ mọi trường của mỗi task. Template là định dạng script tách task đọc trực tiếp, nên:
    - Heading `## Task <N> (T-nn): …`, N liên tục từ 1. Không đặt nội dung nào sau task cuối (script gộp phần đó vào brief của task cuối).
    - **Interfaces:** `Consumes` ghi chữ ký chính xác lấy từ task trước (kèm số task); `Produces` ghi chữ ký chính xác task sau sẽ dùng. Implementer chỉ thấy task của mình — đây là cách duy nhất nó biết tên và kiểu của task lân cận.
+   - **Boundary:** liệt kê đủ mọi thứ task chạm, dùng đúng tên trong từ vựng `Boundary`: stack, từng trigger (vd ghi DB và publish Kafka là hai mục), từng integration. Implementer chọn rule theo dòng này; thiếu một mục là thiếu rule.
+   - **Flow / nhánh:** luôn kèm Bối cảnh, Concurrency & retry, Observability của flow, ngoài các dòng S/B/I của task.
    - Lệnh trong Steps và `Verification` lấy từ repo (manifest scripts, Makefile, CI). Không tìm thấy → `CHƯA XÁC ĐỊNH: <lý do>`, không bịa.
    - Mỗi step chỉ cho phép implementer viết **đúng một** thứ hợp lý: không để dòng không quyết định gì ("xử lý edge case", "thêm validate phù hợp", "TBD"); không viết thân hàm mà chữ ký + test đã quyết định.
 
@@ -122,8 +137,10 @@ Quy mô theo số file: XS 1, S 1–2, M 3–5. Tách tiếp khi > 5 file, > 3 a
 - [ ] **Cắt dọc:** task chia theo flow/nhánh, không theo lớp; task nền chỉ chứa thứ ≥ 2 slice dùng.
 - [ ] **Sở hữu file:** không file nào nằm trong `Files` của hai task, trừ dòng `chia sẻ với T-xx, chỉ <symbol>` có `Phụ thuộc` tương ứng.
 - [ ] **Thứ tự:** mọi `Phụ thuộc` trỏ tới task số nhỏ hơn; task rủi ro cao sớm nhất có thể; mỗi phase kết thúc bằng step `Checkpoint`; bảng kế hoạch task trong plan khớp `TASKS.md`.
+- [ ] **Boundary:** mỗi mục khớp nguyên văn một tên trong từ vựng `Boundary`; đối chiếu Bối cảnh flow (Trigger, Transaction boundary) và `Files`, không thiếu trigger nào.
+- [ ] **Docs:** mỗi task đổi bề mặt developer có `Docs:` và dòng `Verification` cho doc; task không đổi có lý do; không có task chỉ để viết doc.
 - [ ] **Nhất quán interface:** mọi `Consumes` khớp đúng một `Produces` của task trước (tên, tham số, kiểu trả về); không có tên/kiểu nào mà không task nào định nghĩa.
-- [ ] **Độ rõ ràng:** không step nào chứa dòng không quyết định gì; không step nào chép lại thân hàm mà chữ ký + test đã quyết định.
+- [ ] **Độ rõ ràng:** không step nào chứa dòng không quyết định gì; không step nào chép lại thân hàm mà chữ ký + test đã quyết định; không đoạn giải thích/lập luận trong task hoặc flow.
 - [ ] **Tỉ lệ:** `TASKS.md` không dài gấp nhiều lần tổng các flow; nếu code chiếm phần lớn file, thay thân hàm bằng chữ ký + tên test + assertion.
 - [ ] Heading task đúng `## Task <N> (T-nn):`, N liên tục; không có nội dung sau task cuối.
 - [ ] Mọi `path:line` đã đọc thật.

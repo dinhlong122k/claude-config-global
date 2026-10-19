@@ -16,6 +16,8 @@ Chỉ ghi điểm đã đọc thật, dạng `path:line`. Không bịa file.
 
 - `<path:line>` — <entry point / module / pattern cần tái dùng>
 - Cấu trúc vùng thay đổi: `<dir>/` — <lớp/module: entry point, application/domain, persistence, adapter>
+- Stack: <Java/Spring | TypeScript/Node | Python | Go | không có adapter> — theo `<manifest>`; integration: <Kafka, Redis cache, …> | —
+- Doc hiện có: `<README.md, docs/…, openapi.yaml, CHANGELOG.md>` — <bề mặt mỗi file đang mô tả>
 
 ## 3. Phạm vi
 
