@@ -4,13 +4,13 @@
 
 **Spec:** `docs/superpowers/specs/<YYYY-MM-DD-topic>-design.md` + [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) + các flow trong `docs/flows/`. Flow là nguồn sự thật cho hành vi; khi task mâu thuẫn với flow, flow thắng.
 
-**Goal:** <một câu>
+**Goal:** <một câu: kết quả quan sát được khi mọi task xong>
 
 <!--
 Ràng buộc định dạng (do script task-brief của subagent-driven-development):
 - Heading task phải khớp `## Task <N> (T-nn): ...`, N đánh số liên tục 1, 2, 3…
 - Mọi dòng từ heading Task N tới heading Task kế tiếp thuộc brief của task đó,
-  nên KHÔNG đặt nội dung chung nào sau task cuối cùng.
+  nên KHÔNG đặt nội dung chung nào sau task cuối cùng. Checkpoint phase là một step trong task cuối phase.
 -->
 
 ## Global Constraints
@@ -19,7 +19,7 @@ Chép nguyên văn từ `C-*` và `NG-*` của plan, giá trị chính xác, m�
 
 - C-01 MUST <…>
 - NG-01 Không <…>
-- Chỉ sửa file nằm trong "Files" của task đang làm.
+- Chỉ sửa file nằm trong "Files" của task đang làm. Không sửa code mà task khác tạo; dùng qua `Consumes`.
 
 ## Ma trận truy vết
 
@@ -33,21 +33,34 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 
 ---
 
-## Task 1 (T-01): <Tên — một deliverable kiểm chứng được>
+## Task 1 (T-01): <Tên — một deliverable kiểm chứng được, không chứa "và">
 
+**Mục tiêu:** <một câu: sau task này quan sát được gì>
+**Quy mô:** XS | S | M — L trở lên (> 5 file) phải tách
 **Rủi ro:** cao (auth / dữ liệu / API–contract công khai) | thường
+**Phase:** <1 Nền | 2 … >
 **Flow / nhánh:** F-01.S1–S3, F-01.B1 — đọc `docs/flows/F-01-<slug>.md`, chỉ các dòng này
 **Requirements:** REQ-001
 **Phụ thuộc:** — | Task N
 
-**Files:**
+**Acceptance criteria** (≤ 3, mỗi dòng gắn ID, giá trị chính xác từ flow):
+- [ ] F-01.S3: <điều kiện quan sát được, ví dụ "POST /orders trả 201 và một bản ghi status=NEW">
+- [ ] F-01.B1: <…>
+
+**Files** (mỗi file thuộc đúng một task):
 - Create: `exact/path/new_file.ext`
 - Modify: `exact/path/existing.ext:120-145`
+- Modify: `exact/path/routes.ext` — chia sẻ với T-02, chỉ `<symbol>` (chỉ khi không tránh được; phải có `Phụ thuộc`)
 - Test: `tests/exact/path/test_file.ext`
 
 **Interfaces:**
 - Consumes: <tên + chữ ký chính xác từ task trước, ví dụ `OrderRepository.findForUpdate(id: OrderId): Order | null` (Task 1)> | —
 - Produces: <tên + chữ ký chính xác task sau sẽ dùng> | —
+
+**Verification** (task chỉ xong khi mọi dòng đạt; lệnh thật của repo):
+- Test: `<lệnh chạy test của task>` → PASS
+- Lint/build: `<lệnh>` → PASS | CHƯA XÁC ĐỊNH: <lý do>
+- Manual: <việc kiểm bằng tay, nếu có> | —
 
 - [ ] **Step 1: Viết test fail cho F-01.B1**
 
@@ -77,5 +90,10 @@ git add <files>
 git commit -m "<type>: <mô tả> (T-01, F-01.B1)"
 ```
 
-<!-- Lặp lại khối "## Task N (T-nn)" cho mỗi task. Task là đơn vị nhỏ nhất có chu trình test riêng
-     và đáng để reviewer chấp nhận/từ chối độc lập. Không đặt gì sau task cuối. -->
+- [ ] **Step 6: Checkpoint phase <tên> (chỉ task cuối phase — bỏ step này ở task khác)**
+
+Run: `<lệnh full test của repo>` và `<lệnh build>`
+Expected: PASS — mọi flow của phase chạy end-to-end
+
+<!-- Lặp lại khối "## Task N (T-nn)" cho mỗi task. Task là một slice dọc theo flow/nhánh (đủ các lớp nó đi qua),
+     là đơn vị nhỏ nhất có chu trình test riêng và đáng để reviewer chấp nhận/từ chối độc lập. Không đặt gì sau task cuối. -->
