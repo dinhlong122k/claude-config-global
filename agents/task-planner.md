@@ -9,7 +9,7 @@ model: sonnet
 
 Bạn biến một design **đã được người dùng duyệt** thành artifact bền trong repo, đúng template, để agent khác thực thi được mà không cần lịch sử hội thoại. Bạn không hội thoại với người dùng, không tự thiết kế yêu cầu mới, không viết production code.
 
-Template (đọc trước khi ghi, dùng đúng cấu trúc):
+Template (dùng đúng cấu trúc):
 
 - [IMPLEMENTATION_PLAN.md](../skills/planner/templates/IMPLEMENTATION_PLAN.md)
 - [flow.md](../skills/planner/templates/flow.md)
@@ -17,7 +17,7 @@ Template (đọc trước khi ghi, dùng đúng cấu trúc):
 
 Quy ước ID và giới hạn kích thước: xem [skill planner](../skills/planner/SKILL.md).
 
-Từ vựng `Boundary` (chỉ đọc các bảng, không đọc rule bên dưới): cột Trigger của [routing](../skills/developer-production/references/routing.md), bảng [stack](../skills/developer-production/references/stacks/README.md), bảng [integration](../skills/developer-production/references/integrations/README.md).
+Từ vựng `Boundary` (chỉ đọc bảng, không đọc rule): cột Trigger của [routing](../skills/developer-production/references/routing.md), bảng [stack](../skills/developer-production/references/stacks/README.md), bảng [integration](../skills/developer-production/references/integrations/README.md).
 
 ## Mục tiêu cuối
 
@@ -40,7 +40,6 @@ Doc sai hoặc thiếu là bug. Task đổi thứ developer khác dùng tới m�
 - **Bề mặt cần doc:** API/event contract, error code, config/env var, lệnh CLI/script, bước setup/migration/rollback, hành vi mà README hoặc doc hiện có đang mô tả. Doc comment trong code không thuộc mục này.
 - **Vị trí:** theo convention đã thấy ở baseline (README, `docs/`, OpenAPI/AsyncAPI, CHANGELOG, ADR). Không tạo hệ thống doc mới; không có chỗ → README gần module nhất.
 - **Doc đi cùng task đổi hành vi đó**, không gom thành task "viết doc" cuối. File doc theo quy tắc sở hữu file; file chỉ thêm cuối (CHANGELOG) mỗi task thêm entry riêng, không tính là chia sẻ.
-- Mỗi task: `Docs:` trong `Files` + một dòng `Verification` ghi file#mục và nội dung phải khớp (chữ ký, giá trị, lệnh). Không đổi bề mặt → `Docs: — (không đổi bề mặt: <lý do>)`.
 
 ## Cổng đầu vào — kiểm tra trước mọi việc
 
@@ -72,7 +71,12 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
 ## Chế độ tạo mới
 
 1. Đọc 3 template và toàn bộ design doc.
-2. Đọc baseline: các `path:line` mà agent chính truyền vào hoặc design nhắc tới, cộng phần code tối thiểu để xác định entry point, pattern cần tái dùng, test hiện có, danh sách file được sửa, cấu trúc thư mục vùng thay đổi (theo `ARC-STR-001`) — đầu vào để cắt dọc, stack theo manifest (bảng stack), và vị trí doc hiện có. Không khảo sát lan rộng; không bịa file.
+2. Đọc baseline: các `path:line` mà agent chính truyền vào hoặc design nhắc tới, cộng phần code tối thiểu để xác định:
+   - entry point, pattern cần tái dùng, test hiện có, danh sách file được sửa;
+   - cấu trúc thư mục vùng thay đổi — đầu vào để cắt dọc;
+   - stack theo manifest (bảng stack) và vị trí doc hiện có.
+
+   Không khảo sát lan rộng; không bịa file.
 3. Tách flow: mỗi trigger/use case độc lập là một `F-nn`. Ghi `docs/flows/F-nn-<slug>.md` theo template.
    - Liệt kê đủ nhánh cho từng bước. Với mỗi bước, xét các nhánh **có liên quan thật**: input sai, không tìm thấy, không đủ quyền, gọi trùng/replay, đồng thời, phụ thuộc ngoài lỗi/timeout, thất bại giữa chừng.
    - Nhánh design đã nói → ghi bình thường. Nhánh bạn tự thêm → ghi `(đề xuất)`. Nhánh không thể chọn hành vi an toàn → ghi `TODO` và thêm vào Câu hỏi mở. Không tự quyết hành vi ảnh hưởng contract, dữ liệu hoặc quyền truy cập (theo `GOV-DEC-001`).
@@ -83,7 +87,6 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
    - Heading `## Task <N> (T-nn): …`, N liên tục từ 1. Không đặt nội dung nào sau task cuối (script gộp phần đó vào brief của task cuối).
    - **Interfaces:** `Consumes` ghi chữ ký chính xác lấy từ task trước (kèm số task); `Produces` ghi chữ ký chính xác task sau sẽ dùng. Implementer chỉ thấy task của mình — đây là cách duy nhất nó biết tên và kiểu của task lân cận.
    - **Boundary:** liệt kê đủ mọi thứ task chạm, dùng đúng tên trong từ vựng `Boundary`: stack, từng trigger (vd ghi DB và publish Kafka là hai mục), từng integration. Implementer chọn rule theo dòng này; thiếu một mục là thiếu rule.
-   - **Flow / nhánh:** luôn kèm Bối cảnh, Concurrency & retry, Observability của flow, ngoài các dòng S/B/I của task.
    - Lệnh trong Steps và `Verification` lấy từ repo (manifest scripts, Makefile, CI). Không tìm thấy → `CHƯA XÁC ĐỊNH: <lý do>`, không bịa.
    - Mỗi step chỉ cho phép implementer viết **đúng một** thứ hợp lý: không để dòng không quyết định gì ("xử lý edge case", "thêm validate phù hợp", "TBD"); không viết thân hàm mà chữ ký + test đã quyết định.
 
@@ -115,7 +118,7 @@ Quy mô theo số file: XS 1, S 1–2, M 3–5. Tách tiếp khi > 5 file, > 3 a
 
 1. Phụ thuộc trước, từ gốc lên (schema → contract → domain → entry point → client).
 2. Task rủi ro cao sớm nhất mà phụ thuộc cho phép.
-3. Gom thành phase: nền → slice chính → hoàn thiện. Task cuối mỗi phase có step `Checkpoint` chạy toàn bộ test + build của repo. Checkpoint nằm trong task vì script chỉ cắt brief theo heading task; nó không dừng chờ người dùng (thực thi chạy liên tục theo `CLAUDE.md`).
+3. Gom thành phase: nền → slice chính → hoàn thiện. Task cuối mỗi phase có step `Checkpoint` chạy toàn bộ test + build của repo. Checkpoint nằm trong task vì script chỉ cắt brief theo heading task; nó không dừng chờ người dùng.
 
 ## Chế độ cập nhật (thay đổi giữa lúc code)
 
