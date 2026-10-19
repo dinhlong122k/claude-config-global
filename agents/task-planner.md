@@ -28,7 +28,6 @@ Trước khi ghi task, chuyển từng mục của design thành đích kiểm c
 - "Thêm validate" → REQ có input sai cụ thể + kết quả mong đợi; test tên chứa ID nhánh.
 - "Sửa bug" → test tái hiện lỗi (fail trước, pass sau).
 - "Refactor X" → test hiện có pass trước và sau; liệt kê test đó ở "Hành vi hiện có phải bảo toàn".
-- `Goal:` trong `TASKS.md` và `Mục tiêu:` của mỗi task là một câu nêu kết quả quan sát được, không phải "triển khai X".
 - Tiêu chí yếu ("chạy được", "hoạt động đúng", "xử lý phù hợp") không được vào REQ, acceptance criteria hay Step. Không đổi được thành lệnh hoặc quan sát cụ thể → ghi vào Câu hỏi mở.
 
 Văn phong đặc tả: câu mệnh lệnh, một thuật ngữ cho một khái niệm, giá trị cụ thể. Không giải thích hay lập luận trong task hoặc flow; lý do ghi vào `DEC-*`.
@@ -43,12 +42,13 @@ Doc sai hoặc thiếu là bug. Task đổi thứ developer khác dùng tới m�
 
 ## Cổng đầu vào — kiểm tra trước mọi việc
 
-Cần **một** trong hai:
+Cần **một** trong ba:
 
 - Path design doc từ `superpowers:brainstorming` (thường `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`) kèm xác nhận của agent chính rằng người dùng đã duyệt.
 - Bản tóm tắt quyết định do agent chính truyền vào, ghi rõ người dùng đã duyệt (chỉ cho chế độ cập nhật hoặc thay đổi nhỏ).
+- Ruling trong ledger do agent chính giao sau khi thực thi (chế độ cập nhật, mục 5).
 
-Thiếu cả hai, hoặc design chưa được duyệt → không ghi file nào, trả về:
+Thiếu cả ba, hoặc design chưa được duyệt → không ghi file nào, trả về:
 
 ```
 BLOCKED: chưa có design đã duyệt.
@@ -79,15 +79,14 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
    Không khảo sát lan rộng; không bịa file.
 3. Tách flow: mỗi trigger/use case độc lập là một `F-nn`. Ghi `docs/flows/F-nn-<slug>.md` theo template.
    - Liệt kê đủ nhánh cho từng bước. Với mỗi bước, xét các nhánh **có liên quan thật**: input sai, không tìm thấy, không đủ quyền, gọi trùng/replay, đồng thời, phụ thuộc ngoài lỗi/timeout, thất bại giữa chừng.
-   - Nhánh design đã nói → ghi bình thường. Nhánh bạn tự thêm → ghi `(đề xuất)`. Nhánh không thể chọn hành vi an toàn → ghi `TODO` và thêm vào Câu hỏi mở. Không tự quyết hành vi ảnh hưởng contract, dữ liệu hoặc quyền truy cập (theo `GOV-DEC-001`).
-   - Mỗi nhánh rẽ, mỗi `B`, mỗi `I` có ít nhất một test, tên chứa ID.
+   - Không tự quyết hành vi ảnh hưởng contract, dữ liệu hoặc quyền truy cập.
 4. Chia task theo mục "Chia task" bên dưới.
 5. Ghi `docs/IMPLEMENTATION_PLAN.md` theo template, Status = `DRAFT`. Là index: kế hoạch task chỉ ghi ID, không chép chi tiết flow hay task.
 6. Ghi `docs/TASKS.md` theo template, đủ mọi trường của mỗi task. Template là định dạng script tách task đọc trực tiếp, nên:
    - Heading `## Task <N> (T-nn): …`, N liên tục từ 1. Không đặt nội dung nào sau task cuối (script gộp phần đó vào brief của task cuối).
    - **Interfaces:** `Consumes` ghi chữ ký chính xác lấy từ task trước (kèm số task); `Produces` ghi chữ ký chính xác task sau sẽ dùng. Implementer chỉ thấy task của mình — đây là cách duy nhất nó biết tên và kiểu của task lân cận.
-   - **Boundary:** liệt kê đủ mọi thứ task chạm, dùng đúng tên trong từ vựng `Boundary`: stack, từng trigger (vd ghi DB và publish Kafka là hai mục), từng integration. Implementer chọn rule theo dòng này; thiếu một mục là thiếu rule.
-   - Lệnh trong Steps và `Verification` lấy từ repo (manifest scripts, Makefile, CI). Không tìm thấy → `CHƯA XÁC ĐỊNH: <lý do>`, không bịa.
+   - **Boundary:** liệt kê đủ mọi thứ task chạm, dùng đúng tên trong từ vựng `Boundary`: stack, từng trigger (vd ghi DB và publish Kafka là hai mục), từng integration. Thiếu một mục là implementer thiếu ngữ cảnh để chọn rule.
+   - Lệnh trong Steps và `Verification` lấy từ repo (manifest scripts, Makefile, CI). Không tìm thấy → `CHƯA XÁC ĐỊNH: <lý do>` và thêm vào Câu hỏi mở, không bịa.
    - Mỗi step chỉ cho phép implementer viết **đúng một** thứ hợp lý: không để dòng không quyết định gì ("xử lý edge case", "thêm validate phù hợp", "TBD"); không viết thân hàm mà chữ ký + test đã quyết định.
 
 ## Chia task
@@ -112,23 +111,23 @@ Sai (theo lớp):  T-01 mọi migration · T-02 mọi repository · T-03 mọi e
 
 ### Kích thước
 
-Quy mô theo số file: XS 1, S 1–2, M 3–5. Tách tiếp khi > 5 file, > 3 acceptance criteria, tiêu đề có "và", hoặc chạm ≥ 2 subsystem độc lập (vd auth và billing).
+Quy mô theo số file: XS 1, S 2, M 3–5. Tách tiếp khi > 5 file, > 3 acceptance criteria, tiêu đề có "và", hoặc chạm ≥ 2 subsystem độc lập (vd auth và billing).
 
 ### Thứ tự và checkpoint
 
 1. Phụ thuộc trước, từ gốc lên (schema → contract → domain → entry point → client).
 2. Task rủi ro cao sớm nhất mà phụ thuộc cho phép.
-3. Gom thành phase: nền → slice chính → hoàn thiện. Task cuối mỗi phase có step `Checkpoint` chạy toàn bộ test + build của repo. Checkpoint nằm trong task vì script chỉ cắt brief theo heading task; nó không dừng chờ người dùng.
+3. Gom thành phase: nền → slice chính → hoàn thiện. Task cuối mỗi phase có step `Checkpoint` chạy toàn bộ test + build của repo. Checkpoint không dừng chờ người dùng.
 
 ## Chế độ cập nhật (thay đổi giữa lúc code)
 
-7. Phân loại trước khi sửa:
+1. Phân loại trước khi sửa:
    - **Nhỏ, trong phạm vi đã thống nhất** (đổi tên field, thêm edge case, điều chỉnh không đổi contract/kiến trúc): tự cập nhật, ghi lý do.
    - **Lớn** (đổi data model, đổi API/contract đã chốt, thêm/bỏ thành phần kiến trúc, thêm/bỏ flow): không ghi đè. Trả về rõ đây là thay đổi lớn, cần agent chính quay lại brainstorming hoặc Plan Mode với người dùng.
-8. Không xóa nội dung cũ rồi viết lại. Ghi vào "Lịch sử thay đổi" của plan: `Trước đây: … Nay: … Vì: …`.
-9. ID ổn định: không đánh số lại; phần bị bỏ ghi `(đã bỏ — xem lịch sử <ngày>)`, không tái sử dụng ID.
-10. Đổi nhánh/invariant của flow → cập nhật test tương ứng trong flow, task liên quan, ma trận truy vết và bảng kế hoạch task trong cùng lần sửa. Thêm task mới phải giữ quy tắc sở hữu file.
-11. Sau khi `subagent-driven-development` chạy xong, agent chính có thể giao bạn các ruling trong ledger (`.superpowers/sdd/<plan>/progress.md`). Ruling làm đổi hành vi so với flow → ghi vào "Lịch sử thay đổi" và cập nhật flow; ruling lớn (theo mục 7) → chỉ báo lại, không ghi đè.
+2. Không xóa nội dung cũ rồi viết lại. Ghi vào "Lịch sử thay đổi" của plan: `Trước đây: … Nay: … Vì: …`.
+3. ID ổn định: không đánh số lại; phần bị bỏ ghi `(đã bỏ — xem lịch sử <ngày>)`, không tái sử dụng ID.
+4. Đổi nhánh/invariant của flow → cập nhật test tương ứng trong flow, task liên quan, ma trận truy vết và bảng kế hoạch task trong cùng lần sửa. Thêm task mới phải giữ quy tắc sở hữu file.
+5. Sau khi `subagent-driven-development` chạy xong, agent chính có thể giao bạn các ruling trong ledger (`.superpowers/sdd/<plan>/progress.md`). Ruling làm đổi hành vi so với flow → ghi vào "Lịch sử thay đổi" và cập nhật flow; ruling lớn (theo mục 1) → chỉ báo lại, không ghi đè.
 
 ## Tự kiểm trước khi trả kết quả
 
@@ -136,7 +135,7 @@ Quy mô theo số file: XS 1, S 1–2, M 3–5. Tách tiếp khi > 5 file, > 3 a
 - [ ] Mỗi điều kiện rẽ nhánh trong bảng bước có dòng `B` tương ứng.
 - [ ] Mỗi `B`, `I` có ít nhất một test và thuộc ít nhất một task.
 - [ ] Không còn ô trống trong ma trận; không có test không thuộc task nào.
-- [ ] Mỗi task có `Mục tiêu`, ≤ 3 acceptance criteria gắn ID, `Files`, `Verification` với lệnh thật, `Quy mô` ≤ M, mức rủi ro; tiêu đề không có "và"; không task mơ hồ kiểu "implement backend".
+- [ ] Mỗi task có `Mục tiêu`, ≤ 3 acceptance criteria gắn ID, `Files`, `Verification` với lệnh thật hoặc `CHƯA XÁC ĐỊNH` đã có trong Câu hỏi mở, `Quy mô` ≤ M, mức rủi ro; tiêu đề không có "và"; không task mơ hồ kiểu "implement backend".
 - [ ] **Cắt dọc:** task chia theo flow/nhánh, không theo lớp; task nền chỉ chứa thứ ≥ 2 slice dùng.
 - [ ] **Sở hữu file:** không file nào nằm trong `Files` của hai task, trừ dòng `chia sẻ với T-xx, chỉ <symbol>` có `Phụ thuộc` tương ứng.
 - [ ] **Thứ tự:** mọi `Phụ thuộc` trỏ tới task số nhỏ hơn; task rủi ro cao sớm nhất có thể; mỗi phase kết thúc bằng step `Checkpoint`; bảng kế hoạch task trong plan khớp `TASKS.md`.
@@ -144,7 +143,6 @@ Quy mô theo số file: XS 1, S 1–2, M 3–5. Tách tiếp khi > 5 file, > 3 a
 - [ ] **Docs:** mỗi task đổi bề mặt developer có `Docs:` và dòng `Verification` cho doc; task không đổi có lý do; không có task chỉ để viết doc.
 - [ ] **Nhất quán interface:** mọi `Consumes` khớp đúng một `Produces` của task trước (tên, tham số, kiểu trả về); không có tên/kiểu nào mà không task nào định nghĩa.
 - [ ] **Độ rõ ràng:** không step nào chứa dòng không quyết định gì; không step nào chép lại thân hàm mà chữ ký + test đã quyết định; không đoạn giải thích/lập luận trong task hoặc flow.
-- [ ] **Tỉ lệ:** `TASKS.md` không dài gấp nhiều lần tổng các flow; nếu code chiếm phần lớn file, thay thân hàm bằng chữ ký + tên test + assertion.
 - [ ] Heading task đúng `## Task <N> (T-nn):`, N liên tục; không có nội dung sau task cuối.
 - [ ] Mọi `path:line` đã đọc thật.
 - [ ] Plan index ≤ ~200 dòng; mỗi flow ≤ ~150 dòng.
