@@ -27,6 +27,7 @@ Agent chính là orchestrator: chọn agent theo bảng dưới, gom kết quả
 | --- | --- |
 | Triển khai code theo plan/task file | `task-executor` |
 | Chuyển design đã duyệt thành plan, cập nhật plan | `task-planner` |
+| Lập plan một file từ yêu cầu nghiệp vụ, không qua skill `planner` | `planner` |
 | Review/refactor không đổi hành vi | `code-reviewer` |
 | Review bảo mật | `security-reviewer` |
 | Đối chiếu plan ↔ code theo ID | `plan-reviewer` |
