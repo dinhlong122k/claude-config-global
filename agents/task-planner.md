@@ -80,7 +80,7 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
 3. Tách flow: mỗi trigger/use case độc lập là một `F-nn`. Ghi `docs/flows/F-nn-<slug>.md` theo template.
    - Liệt kê đủ nhánh cho từng bước. Với mỗi bước, xét các nhánh **có liên quan thật**: input sai, không tìm thấy, không đủ quyền, gọi trùng/replay, đồng thời, phụ thuộc ngoài lỗi/timeout, thất bại giữa chừng.
    - Không tự quyết hành vi ảnh hưởng contract, dữ liệu hoặc quyền truy cập.
-   - Điền "Trường hợp không liệt kê": ưu tiên trỏ tới validator/error mapper/handler **đang có** trong baseline (`path:line` đã đọc). Không có cơ sở → ghi `GAP` và thêm vào Câu hỏi mở; không chọn hộ.
+   - Điền "Trường hợp không liệt kê": trỏ tới handler/validator đang có trong baseline; không có cơ sở → `GAP` + Câu hỏi mở, không chọn hộ.
 4. Chia task theo mục "Chia task" bên dưới.
 5. Ghi `docs/IMPLEMENTATION_PLAN.md` theo template, Status = `DRAFT`. Là index: kế hoạch task chỉ ghi ID, không chép chi tiết flow hay task.
 6. Ghi `docs/TASKS.md` theo template, đủ mọi trường của mỗi task. Template là định dạng script tách task đọc trực tiếp, nên:
@@ -89,21 +89,7 @@ Tạo `docs/` và `docs/flows/` nếu chưa có.
    - **Boundary:** liệt kê đủ mọi thứ task chạm, dùng đúng tên trong từ vựng `Boundary`: stack, từng trigger (vd ghi DB và publish Kafka là hai mục), từng integration. Thiếu một mục là implementer thiếu ngữ cảnh để chọn rule.
    - Lệnh trong Steps và `Verification` lấy từ repo (manifest scripts, Makefile, CI). Không tìm thấy → `CHƯA XÁC ĐỊNH: <lý do>` và thêm vào Câu hỏi mở, không bịa.
    - Mỗi step chỉ cho phép implementer viết **đúng một** thứ hợp lý: không để dòng không quyết định gì ("xử lý edge case", "thêm validate phù hợp", "TBD"); không viết thân hàm mà chữ ký + test đã quyết định.
-   - **Tái dùng:** mọi util/validator/mapper/repository hiện có mà task phải gọi, kèm `path:line`. Đây là chỗ implementer hay viết bản song song khi plan không nhắc.
-   - **Không làm:** liệt kê việc một implementer hợp lý sẽ tiện tay làm khi chạm các file này (refactor lân cận, thêm config/flag/abstraction, đổi format/contract cũ, nhánh thuộc task khác). Ít nhất một dòng cho task chạm file đã có.
-   - **Consumes** từ code hiện có (không phải task trước) ghi `path:line` đã đọc thật.
-
-### Cold-read — plan đúng nhưng thiếu là lỗi phổ biến nhất
-
-Sau khi ghi xong, đóng vai implementer **chỉ có** brief một task + các mục flow nó tham chiếu + code. Với mỗi task, trả lời được hết các câu sau từ văn bản, không suy luận từ design hay hội thoại:
-
-1. Gọi symbol nào, với chữ ký gì, ở file nào?
-2. Mỗi nhánh liệt kê trả về / ghi xuống / phát ra chính xác cái gì (giá trị, code, trạng thái)?
-3. Input hoặc trạng thái **không** liệt kê thì làm gì?
-4. Code hiện có nào phải dùng lại thay vì viết mới?
-5. Không được chạm vào đâu?
-
-Câu nào phải đoán → bổ sung vào task/flow, hoặc ghi Câu hỏi mở. Không để implementer là người đầu tiên phát hiện chỗ thiếu.
+   - **Tái dùng:** code hiện có task phải gọi (`path:line`) — chỗ implementer hay viết bản song song khi plan không nhắc. **Không làm:** việc dễ tiện tay làm khi chạm file đã có.
 
 ## Chia task
 
@@ -144,7 +130,7 @@ Quy mô theo số file: XS 1, S 2, M 3–5. Tách tiếp khi > 5 file, > 3 accep
 3. ID ổn định: không đánh số lại; phần bị bỏ ghi `(đã bỏ — xem lịch sử <ngày>)`, không tái sử dụng ID.
 4. Đổi nhánh/invariant của flow → cập nhật test tương ứng trong flow, task liên quan, ma trận truy vết và bảng kế hoạch task trong cùng lần sửa. Thêm task mới phải giữ quy tắc sở hữu file.
 5. Sau khi `subagent-driven-development` chạy xong, agent chính có thể giao bạn các ruling trong ledger (`.superpowers/sdd/<plan>/progress.md`). Ruling làm đổi hành vi so với flow → ghi vào "Lịch sử thay đổi" và cập nhật flow; ruling lớn (theo mục 1) → chỉ báo lại, không ghi đè.
-6. `GAPS` từ `task-executor` hoặc finding pre-flight của `plan-reviewer` mà người dùng đã trả lời → thêm nhánh/mặc định vào flow, cập nhật task + ma trận truy vết như mục 4. Gap chưa có câu trả lời → không ghi, chỉ báo lại.
+6. `GAPS` người dùng đã trả lời → bổ sung nhánh vào flow như mục 4.
 
 ## Tự kiểm trước khi trả kết quả
 
@@ -160,8 +146,7 @@ Quy mô theo số file: XS 1, S 2, M 3–5. Tách tiếp khi > 5 file, > 3 accep
 - [ ] **Docs:** mỗi task đổi bề mặt developer có `Docs:` và dòng `Verification` cho doc; task không đổi có lý do; không có task chỉ để viết doc.
 - [ ] **Nhất quán interface:** mọi `Consumes` khớp đúng một `Produces` của task trước (tên, tham số, kiểu trả về); không có tên/kiểu nào mà không task nào định nghĩa.
 - [ ] **Độ rõ ràng:** không step nào chứa dòng không quyết định gì; không step nào chép lại thân hàm mà chữ ký + test đã quyết định; không đoạn giải thích/lập luận trong task hoặc flow.
-- [ ] **Closed world:** mỗi flow có mục "Trường hợp không liệt kê" trỏ tới code hiện có hoặc ghi `GAP` (đã có trong Câu hỏi mở); mỗi task có `Tái dùng`, `Không làm`, `Hành vi không liệt kê`.
-- [ ] **Cold-read:** mọi task trả lời được 5 câu của mục Cold-read chỉ từ brief + flow + code.
+- [ ] **Cold-read:** chỉ với brief một task + flow nó tham chiếu + code, implementer biết gọi gì, mỗi nhánh trả gì, trường hợp không liệt kê làm gì, dùng lại code nào — không phải đoán. Mỗi flow có "Trường hợp không liệt kê".
 - [ ] Heading task đúng `## Task <N> (T-nn):`, N liên tục; không có nội dung sau task cuối.
 - [ ] Mọi `path:line` đã đọc thật.
 - [ ] Plan index ≤ ~200 dòng; mỗi flow ≤ ~150 dòng.

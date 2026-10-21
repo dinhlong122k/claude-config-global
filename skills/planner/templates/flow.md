@@ -30,10 +30,7 @@ Mọi điều kiện rẽ nhánh phải có dòng `B` tương ứng. Nhánh agen
 
 ## Trường hợp không liệt kê
 
-Bắt buộc. Implementer không được tự đặt hành vi cho trường hợp không có trong bảng nhánh; mục này là câu trả lời mặc định của nó.
-
-- Input/trạng thái không khớp bước hay nhánh nào: <từ chối với `<error code>` qua `<validator/mapper hiện có, path:line>` | giữ nguyên hành vi hiện có của `<symbol, path:line>` | GAP — implementer dừng và hỏi>
-- Lỗi phụ thuộc ngoài không có nhánh riêng: <propagate qua `<error handler hiện có>` | GAP>
+Bắt buộc. Mặc định cho input/lỗi không có trong bảng nhánh: <dùng `<handler/validator hiện có, path:line>` | giữ hành vi hiện có | GAP (đã có trong Câu hỏi mở)>
 
 ## Trạng thái (bỏ nếu flow không có lifecycle)
 

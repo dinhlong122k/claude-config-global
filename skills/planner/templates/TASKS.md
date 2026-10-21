@@ -56,18 +56,11 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 - Docs: `README.md#<mục>` / `docs/api/openapi.yaml` / `CHANGELOG.md` (entry riêng) — <nội dung phải đổi> | — (không đổi bề mặt: <lý do>)
 
 **Interfaces:**
-- Consumes: <tên + chữ ký chính xác từ task trước, ví dụ `OrderRepository.findForUpdate(id: OrderId): Order | null` (Task 1)> | <symbol code hiện có, `path:line`> | —
+- Consumes: <tên + chữ ký chính xác từ task trước, ví dụ `OrderRepository.findForUpdate(id: OrderId): Order | null` (Task 1)> | —
 - Produces: <tên + chữ ký chính xác task sau sẽ dùng> | —
 
-**Tái dùng** (code hiện có task phải gọi, không viết bản mới):
-- `<symbol>` — `path:line` — <dùng cho việc gì: validate / map lỗi / transaction / auth …> | —
-
-**Quyết định áp dụng:** DEC-001, C-02 | —
-
-**Không làm** (việc implementer dễ tiện tay làm nhưng ngoài task này):
-- <vd: không đổi format response của endpoint cũ; không thêm config/flag; không refactor `OrderService` ngoài `<symbol>`; nhánh F-01.B4 thuộc T-04>
-
-**Hành vi không liệt kê:** theo mục "Trường hợp không liệt kê" của `docs/flows/F-01-<slug>.md`.
+**Tái dùng:** `<symbol>` (`path:line`) — <validate / map lỗi / auth …> | —
+**Không làm:** <việc dễ tiện tay làm khi chạm các file này, vd không đổi response endpoint cũ; nhánh F-01.B4 thuộc T-04> | —
 
 **Verification** (task chỉ xong khi mọi dòng đạt; lệnh thật của repo):
 - Test: `<lệnh chạy test của task>` → PASS

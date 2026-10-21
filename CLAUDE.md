@@ -38,9 +38,8 @@ Khi người dùng đưa file plan/task và yêu cầu triển khai:
 
 1. `docs/TASKS.md` theo template `planner` (heading `## Task N (T-nn)`): chạy `superpowers:subagent-driven-development`, nhưng **implementer dispatch bằng `subagent_type: task-executor`** thay cho `general-purpose`. Đây là ưu tiên của người dùng, ghi đè template implementer của skill đó. Không có skill đó, hoặc file task dạng khác: dispatch `task-executor` lần lượt từng task (một subagent một task, không song song).
 2. Chạy liên tục, không dừng giữa task kể cả task rủi ro cao, trừ khi `task-executor` trả `BLOCKED` hoặc `NEEDS_CONTEXT`. Khi đó dừng task đó và task phụ thuộc, chạy tiếp task độc lập.
-   - **Plan im lặng ≠ mâu thuẫn.** Chỉ phân xử (ruling) khi task, flow hoặc code có dòng quyết định trường hợp đó. Không có → gap (`PLAN-EXE-001`): không tự chọn hành vi, không bảo implementer "làm theo cách hợp lý". Gom mọi `GAPS` hỏi người dùng một lượt; trả lời xong giao `task-planner` cập nhật flow rồi mới chạy lại task bị chặn.
-   - Plan được giao mà chưa qua pre-flight (không đi qua skill `planner`) → giao `plan-reviewer` chế độ `pre-flight` trước task đầu tiên.
+   - Plan im lặng ≠ mâu thuẫn: không tự chọn hành vi (`PLAN-EXE-001`). Gom `GAPS` hỏi người dùng một lượt, rồi chạy lại task bị chặn.
    Review dồn ở cuối:
-   - `security-reviewer` trên diff toàn nhánh, và `plan-reviewer` chế độ `post` đối chiếu theo ID.
+   - `security-reviewer` trên diff toàn nhánh, và `plan-reviewer` đối chiếu theo ID.
    - `code-reviewer` (chế độ chỉ review) khi không chạy qua `subagent-driven-development`, vì skill đó đã review chất lượng từng task.
 3. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm danh sách file đã đổi, giả định/ruling, check chưa chạy.
