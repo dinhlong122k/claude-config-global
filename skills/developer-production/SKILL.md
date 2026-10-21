@@ -47,5 +47,5 @@ Subagents never ask the user or dispatch reviewers: questions, blockers, and cha
 
 - [Routing](references/routing.md): trigger → reference.
 - [Feature review](references/workflow/feature-review.md): checklist for integrations/multi-boundary changes; fill only rows with a trigger.
-- [Plan deviation](references/workflow/plan-execution.md): classify deviations for the report; never edit the plan.
+- [Plan deviation](references/workflow/plan-execution.md): closed-world rule for gaps (`PLAN-EXE-001`), classify deviations for the report, scope check; never edit the plan.
 - [Catalog extension](references/governance/skill-extension-assumptions.md): read only when editing this skill.

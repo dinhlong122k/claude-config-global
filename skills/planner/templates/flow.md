@@ -28,6 +28,13 @@ Mọi điều kiện rẽ nhánh phải có dòng `B` tương ứng. Nhánh agen
 | --- | --- | --- | --- | --- |
 | B1 | <…> | <…> | không đổi / <…> | <status code / error code> |
 
+## Trường hợp không liệt kê
+
+Bắt buộc. Implementer không được tự đặt hành vi cho trường hợp không có trong bảng nhánh; mục này là câu trả lời mặc định của nó.
+
+- Input/trạng thái không khớp bước hay nhánh nào: <từ chối với `<error code>` qua `<validator/mapper hiện có, path:line>` | giữ nguyên hành vi hiện có của `<symbol, path:line>` | GAP — implementer dừng và hỏi>
+- Lỗi phụ thuộc ngoài không có nhánh riêng: <propagate qua `<error handler hiện có>` | GAP>
+
 ## Trạng thái (bỏ nếu flow không có lifecycle)
 
 ```mermaid

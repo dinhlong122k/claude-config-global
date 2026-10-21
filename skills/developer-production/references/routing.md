@@ -5,7 +5,7 @@
 | Trigger | Rule owner cần đọc |
 | --- | --- |
 | Mọi feature production | [governance](governance/decision-gate.md), [error](controls/error.md), [observability](controls/observability.md), [testing](controls/testing.md), [code quality](controls/code-quality.md) |
-| Flow thực tế lệch plan, hoặc plan cần cập nhật giữa quá trình | [plan-execution](workflow/plan-execution.md) |
+| Flow thực tế lệch plan, plan không nói gì về trường hợp code phải xử lý, hoặc plan cần cập nhật giữa quá trình | [plan-execution](workflow/plan-execution.md) |
 | Tạo/đổi module, folder hoặc dependency | [structure](architecture/structure.md), [dependencies](architecture/dependencies.md) |
 | External call, file transfer, broker/cache | [external boundary](architecture/external-boundary.md), [resilience](controls/resilience.md) |
 | API/HTTP | [HTTP/API](controls/http-api.md), [security](controls/security.md) |

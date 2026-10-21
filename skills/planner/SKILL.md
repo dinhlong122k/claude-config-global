@@ -25,14 +25,16 @@ Skill này chạy ở **agent chính**: chỉ agent chính hội thoại đượ
 4. **Xử lý kết quả `task-planner`.**
    - `BLOCKED` → làm theo lý do trả về (thường là quay lại bước 1).
    - Còn mục trong "Câu hỏi mở" hoặc nhánh `TODO` trong flow → đưa người dùng trong **một** tin nhắn, quan trọng trước; cập nhật bằng cách giao lại `task-planner`.
-5. **Cổng 2 — duyệt plan.** Đưa người dùng: danh sách flow, nhánh/invariant mà `task-planner` tự bổ sung (đánh dấu "đề xuất"), và các task rủi ro cao. Người dùng nên dồn thời gian review vào bảng nhánh của flow, không phải task. Đây là cổng duyệt **cuối cùng trước khi code** — sau cổng này thực thi chạy liên tục.
-6. **Thực thi** — theo mục "Thực thi plan" trong `CLAUDE.md`: invoke `superpowers:subagent-driven-development` với `PLAN_FILE = docs/TASKS.md`, implementer là agent `task-executor` (nạp sẵn `developer-production`). Không có subagent tool → `superpowers:executing-plans` và agent chính tự áp dụng `developer-production`.
+5. **Pre-flight** — giao `plan-reviewer` chế độ `pre-flight`. Nó đọc plan như implementer không có lịch sử hội thoại và trả các chỗ phải đoán (tham chiếu sai, nhánh code có mà flow không có, giá trị mơ hồ, code nên dùng lại). Gap có đề xuất rõ, không đổi contract → giao lại `task-planner` bổ sung rồi chạy pre-flight lại (tối đa 2 vòng). Gap cần người dùng quyết → đưa vào cổng 2.
+6. **Cổng 2 — duyệt plan.** Đưa người dùng: danh sách flow, nhánh/invariant mà `task-planner` tự bổ sung (đánh dấu "đề xuất"), gap pre-flight còn mở, và các task rủi ro cao. `READY: không` thì không sang thực thi. Người dùng nên dồn thời gian review vào bảng nhánh của flow, không phải task. Đây là cổng duyệt **cuối cùng trước khi code** — sau cổng này thực thi chạy liên tục.
+7. **Thực thi** — theo mục "Thực thi plan" trong `CLAUDE.md`: invoke `superpowers:subagent-driven-development` với `PLAN_FILE = docs/TASKS.md`, implementer là agent `task-executor` (nạp sẵn `developer-production`). Không có subagent tool → `superpowers:executing-plans` và agent chính tự áp dụng `developer-production`.
    - Chạy liên tục, không dừng giữa các task, kể cả task rủi ro cao; review dồn ở cuối (review toàn branch của skill đó). Đây là lựa chọn đã chốt của người dùng.
    - Mỗi implementer chỉ nhận brief của task mình; brief trỏ tới đúng flow/nhánh cần đọc, không nạp toàn bộ `docs/flows/`.
-   - Mâu thuẫn giữa task và flow: skill tự phân xử với spec làm chuẩn và ghi ruling vào ledger — không dừng hỏi.
-7. **Sau khi chạy xong** — trước khi báo hoàn thành:
-   - Giao `plan-reviewer` đối chiếu plan/flow với code theo ID (`F-nn.Bk`, `I-k`, `REQ-*`).
-   - Giao `task-planner` (chế độ cập nhật) các ruling trong ledger để cập nhật flow và "Lịch sử thay đổi".
+   - Mâu thuẫn giữa task và flow (cả hai cùng nói, nói khác nhau): skill tự phân xử với flow làm chuẩn và ghi ruling vào ledger — không dừng hỏi.
+   - **Plan im lặng không phải mâu thuẫn.** Không có dòng nào trong task/flow/code quyết định trường hợp đó → đó là gap (`PLAN-EXE-001`), không phải ruling: không tự phân xử, không code phần đó. Task bị chặn trả `NEEDS_CONTEXT`; task độc lập chạy tiếp; gap gom lại hỏi người dùng một lượt.
+8. **Sau khi chạy xong** — trước khi báo hoàn thành:
+   - Giao `plan-reviewer` chế độ `post` đối chiếu plan/flow với code theo ID (`F-nn.Bk`, `I-k`, `REQ-*`), kể cả chiều ngược (`NGOÀI PLAN`).
+   - Giao `task-planner` (chế độ cập nhật) các ruling trong ledger và các gap người dùng đã trả lời để cập nhật flow và "Lịch sử thay đổi".
    - Báo người dùng một lượt: kết quả review cuối, các ruling đã đưa ra, và **các task rủi ro cao** (auth, dữ liệu, contract) kèm diff để họ soát lại vì chúng không có cổng dừng giữa chừng.
 
 Plan cần đổi lớn (data model, contract, kiến trúc) mà skill thực thi không phân xử được an toàn → nó dừng theo điều kiện riêng của nó; quay lại bước 1 hoặc giao `task-planner` theo `GOV-DEC-001`.
