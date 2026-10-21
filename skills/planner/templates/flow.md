@@ -22,11 +22,40 @@ Mọi điều kiện rẽ nhánh phải có dòng `B` tương ứng. Nhánh agen
 | S1 | <bước> | <điều kiện> → B1 | <kết quả happy path> |
 | S2 | <bước> | — | <…> |
 
+## Diagram
+
+Bắt buộc. Actor → entry point → service → store/integration; happy path đủ bước, mỗi `B` là một nhánh `alt`/`else` nhãn `Bk` kèm mã trả về.
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant API as POST /orders
+    participant S as OrderService
+    participant DB as orders
+    U->>API: {sku, qty}
+    alt B1 qty <= 0
+        API-->>U: 400 INVALID_QTY
+    else S1–S2 hợp lệ
+        API->>S: create(sku, qty)
+        S->>DB: insert status=NEW
+        API-->>U: 201 ORDER_CREATED
+    end
+```
+
+## Mã kết quả
+
+Bắt buộc. Mỗi `S` kết thúc và mỗi `B` có đúng một dòng. Không phải HTTP (job/event) → ghi status/event tương ứng.
+
+| Mã | HTTP/status | Bước/nhánh | Body/payload |
+| --- | --- | --- | --- |
+| `ORDER_CREATED` | 201 | S2 | `{id, status:"NEW"}` |
+| `INVALID_QTY` | 400 | B1 | `{code, message}` |
+
 ## Nhánh lỗi / biên
 
-| # | Khi nào | Hành vi | Trạng thái dữ liệu sau đó | Response / event |
+| # | Khi nào | Hành vi | Trạng thái dữ liệu sau đó | Mã |
 | --- | --- | --- | --- | --- |
-| B1 | <…> | <…> | không đổi / <…> | <status code / error code> |
+| B1 | <…> | <…> | không đổi / <…> | <mã trong "Mã kết quả"> |
 
 ## Trường hợp không liệt kê
 
@@ -57,10 +86,4 @@ Chuyển trạng thái bị cấm: <A → C, …>. Terminal: <…>.
 
 ## Test bắt buộc
 
-Mỗi `S` có rẽ nhánh, mỗi `B` và mỗi `I` phải có ít nhất một test. Tên test chứa ID.
-
-| Test | Chứng minh | Loại |
-| --- | --- | --- |
-| `Fnn_S_happy_path_<…>` | S1–Sn | integration |
-| `Fnn_B1_<…>` | B1 | unit |
-| `Fnn_I1_<…>` | I1 | integration |
+Mỗi `S` có rẽ nhánh, mỗi `B`, `I` có ≥ 1 test; tên test chứa ID.

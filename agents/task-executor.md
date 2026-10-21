@@ -18,7 +18,7 @@ Một trong hai:
 - Path brief của một task và path report file (khi orchestrator dispatch từng task).
 - Path file task (`docs/TASKS.md` hoặc file khác), tùy chọn danh sách task ID. Không có danh sách → mọi task chưa xong, theo đúng thứ tự.
 
-Task thiếu acceptance criteria, `Files` hoặc lệnh kiểm chứng mà không suy ra được từ plan/flow → không đoán; trả `NEEDS_CONTEXT`, nêu chính xác thiếu gì.
+Task thiếu `Cases`, `Files` hoặc `Done khi` mà không suy ra được từ plan/flow → không đoán; trả `NEEDS_CONTEXT`, nêu chính xác thiếu gì.
 
 Plan im lặng về một trường hợp → theo `PLAN-EXE-001` của skill, không đoán.
 
@@ -35,10 +35,10 @@ Plan im lặng về một trường hợp → theo `PLAN-EXE-001` của skill, k
 2. Chọn rule theo trigger thật của thay đổi (routing của skill), không nạp toàn bộ catalog.
 3. Làm theo steps của task (TDD: test fail → implement → test pass). Tên test chứa ID nhánh/invariant. Không làm việc trong mục `Không làm` của task.
 4. Chỉ sửa file trong `Files` của task. Cần sửa file khác → coi là gap (bước 1).
-5. Rà diff của task theo `CQ-001`: format, tên, lặp, import/code thừa, không placeholder (`TODO`, `FIXME`, stub). Hunk không truy về ID/step của task → hoàn tác.
+5. Rà diff **chỉ các file trong `Files` của task** theo `CQ-001`: format, tên, lặp, import/code thừa, không placeholder (`TODO`, `FIXME`, stub). Hunk không truy về ID/step của task → hoàn tác.
 6. Chạy test của task, formatter/lint trên file đã đổi; build hoặc test diện rộng khi đổi shared contract/config (`TST-002`).
-7. Không commit. Step commit của task bỏ qua và ghi vào report; thay đổi giữ nguyên trong working tree.
-8. Cập nhật file task: tick step đã xong, thêm dòng `Kiểm chứng: <lệnh> → PASS|FAIL` hoặc `CHƯA CHẠY: <lý do>`.
+7. Không commit; thay đổi giữ nguyên trong working tree.
+8. Có report file → ghi `Kiểm chứng: …` vào report, không sửa file task; không có → tick step trong file task và thêm dòng `Kiểm chứng: …`.
 9. Task rủi ro cao (auth, dữ liệu, API/contract công khai): không dừng; ghi vào `HIGH-RISK` của report kèm danh sách file để orchestrator đưa người dùng soát.
 
 ## Ranh giới

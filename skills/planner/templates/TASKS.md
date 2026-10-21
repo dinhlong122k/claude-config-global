@@ -1,6 +1,6 @@
 # <Tên feature> — Tasks
 
-> File này chỉ mô tả **làm gì**. Cách thực thi (agent nào, nạp rule nào, review khi nào) do mục "Thực thi plan" trong `CLAUDE.md` quyết định; không ghi tên skill hay agent trong task. Steps dùng checkbox (`- [ ]`).
+> Steps dùng checkbox (`- [ ]`).
 
 **Spec:** `docs/superpowers/specs/<YYYY-MM-DD-topic>-design.md` + [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) + các flow trong `docs/flows/`. Flow là nguồn sự thật cho hành vi; khi task mâu thuẫn với flow, flow thắng.
 
@@ -19,7 +19,6 @@ Chép nguyên văn từ `C-*` và `NG-*` của plan, giá trị chính xác, m�
 
 - C-01 MUST <…>
 - NG-01 Không <…>
-- Chỉ sửa file nằm trong "Files" của task đang làm. Không sửa code mà task khác tạo; dùng qua `Consumes`.
 
 ## Ma trận truy vết
 
@@ -35,25 +34,27 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 
 ## Task 1 (T-01): <Tên — một deliverable kiểm chứng được, không chứa "và">
 
-**Mục tiêu:** <một câu: sau task này quan sát được gì>
-**Quy mô:** XS | S | M — L trở lên (> 5 file) phải tách
+**Goal:** <một câu: kết quả quan sát được khi task này xong>
+**Wave:** <n>
 **Rủi ro:** cao (auth / dữ liệu / API–contract công khai) | thường
-**Phase:** <1 Nền | 2 … >
 **Boundary:** <stack> · <từng trigger> · <từng integration> — tên nguyên văn theo bảng routing/stack/integration, ví dụ `Java/Spring · API/HTTP · Database write, nhiều store · Kafka`
 **Flow / nhánh:** F-01.S1–S3, F-01.B1 — đọc `docs/flows/F-01-<slug>.md`: Bối cảnh, Concurrency & retry, Observability và các dòng này
 **Requirements:** REQ-001
 **Phụ thuộc:** — | Task N
 
-**Acceptance criteria** (≤ 3, mỗi dòng gắn ID, giá trị chính xác từ flow):
-- [ ] F-01.S3: <điều kiện quan sát được, ví dụ "POST /orders trả 201 và một bản ghi status=NEW">
-- [ ] F-01.B1: <…>
+**Cases** (≤ 5 dòng, nhiều hơn → tách task; Loại: happy | fail | invariant; dòng đầu là happy; mã lấy từ "Mã kết quả" của flow).
+
+| ID | Loại | Input | Output (mã + trạng thái dữ liệu) | Test |
+| --- | --- | --- | --- | --- |
+| F-01.S3 | happy | `{sku:"A1",qty:2}` | `201 ORDER_CREATED`; 1 bản ghi status=NEW | `F01_S_happy_path_<…>` |
+| F-01.B1 | fail | `{sku:"A1",qty:0}` | `400 INVALID_QTY`; không bản ghi nào | `F01_B1_<…>` |
 
 **Files** (mỗi file thuộc đúng một task):
 - Create: `exact/path/new_file.ext`
 - Modify: `exact/path/existing.ext:120-145`
 - Modify: `exact/path/routes.ext` — chia sẻ với T-02, chỉ `<symbol>` (chỉ khi không tránh được; phải có `Phụ thuộc`)
 - Test: `tests/exact/path/test_file.ext`
-- Docs: `README.md#<mục>` / `docs/api/openapi.yaml` / `CHANGELOG.md` (entry riêng) — <nội dung phải đổi> | — (không đổi bề mặt: <lý do>)
+- Docs: `<path#mục>` | — (không đổi bề mặt: <lý do>)
 
 **Interfaces:**
 - Consumes: <tên + chữ ký chính xác từ task trước, ví dụ `OrderRepository.findForUpdate(id: OrderId): Order | null` (Task 1)> | —
@@ -62,16 +63,16 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 **Tái dùng:** `<symbol>` (`path:line`) — <validate / map lỗi / auth …> | —
 **Không làm:** <việc dễ tiện tay làm khi chạm các file này, vd không đổi response endpoint cũ; nhánh F-01.B4 thuộc T-04> | —
 
-**Verification** (task chỉ xong khi mọi dòng đạt; lệnh thật của repo):
-- Test: `<lệnh chạy test của task>` → PASS
-- Lint/build: `<lệnh>` → PASS | CHƯA XÁC ĐỊNH: <lý do>
+**Done khi** (mọi dòng đạt; lệnh thật của repo):
+- Test (mọi test trong Cases): `<lệnh>` → PASS
+- Lint/build: `<lệnh>` → exit 0 | CHƯA XÁC ĐỊNH: <lý do>
 - Docs: `<file#mục>` khớp <chữ ký / giá trị / lệnh cụ thể>; lệnh lint doc nếu repo có | —
 - Manual: <việc kiểm bằng tay, nếu có> | —
 
-- [ ] **Step 1: Viết test fail cho F-01.B1**
+- [ ] **Step 1: Viết test fail cho mọi dòng trong Cases**
 
 ```<lang>
-// tên test chứa ID; assertion với giá trị chính xác từ flow
+// tên test chứa ID; assertion với mã + trạng thái dữ liệu chính xác từ Cases
 test("F01_B1_<…>", () => { … })
 ```
 
@@ -93,14 +94,7 @@ Expected: PASS
 
 <file#mục — nội dung chính xác cần thêm/sửa, lấy từ chữ ký và giá trị của task>
 
-- [ ] **Step 6: Commit** (code + test + doc cùng commit)
-
-```bash
-git add <files>
-git commit -m "<type>: <mô tả> (T-01, F-01.B1)"
-```
-
-- [ ] **Step 7: Checkpoint phase <tên> (chỉ task cuối phase — bỏ step này ở task khác)**
+- [ ] **Step 6: Checkpoint phase <tên> (chỉ task cuối phase — bỏ step này ở task khác)**
 
 Run: `<lệnh full test của repo>` và `<lệnh build>`
 Expected: PASS — mọi flow của phase chạy end-to-end

@@ -37,7 +37,7 @@ Agent chính là orchestrator: chọn agent theo bảng dưới, gom kết quả
 
 Khi người dùng đưa file plan/task và yêu cầu triển khai:
 
-1. `docs/TASKS.md` theo template `planner` (heading `## Task N (T-nn)`): chạy `superpowers:subagent-driven-development`, nhưng **implementer dispatch bằng `subagent_type: task-executor`** thay cho `general-purpose`. Đây là ưu tiên của người dùng, ghi đè template implementer của skill đó. Không có skill đó, hoặc file task dạng khác: dispatch `task-executor` lần lượt từng task (một subagent một task, không song song).
+1. `docs/TASKS.md` theo template `planner` (heading `## Task N (T-nn)`): chạy `superpowers:subagent-driven-development`, nhưng **implementer dispatch bằng `subagent_type: task-executor`** thay cho `general-purpose`. Đây là ưu tiên của người dùng, ghi đè template implementer của skill đó. Không có skill đó, hoặc file task dạng khác: dispatch theo `Wave` — task cùng wave chạy song song (mỗi task một `task-executor`), wave sau chờ wave trước xong; file task không có `Wave` → lần lượt từng task.
 2. Chạy liên tục, không dừng giữa task kể cả task rủi ro cao, trừ khi `task-executor` trả `BLOCKED` hoặc `NEEDS_CONTEXT`. Khi đó dừng task đó và task phụ thuộc, chạy tiếp task độc lập.
    - Plan im lặng ≠ mâu thuẫn: không tự chọn hành vi (`PLAN-EXE-001`). Gom `GAPS` hỏi người dùng một lượt, rồi chạy lại task bị chặn.
    Review dồn ở cuối:
