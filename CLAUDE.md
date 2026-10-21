@@ -40,4 +40,4 @@ Khi người dùng đưa file plan/task và yêu cầu triển khai:
 2. Chạy liên tục, không dừng giữa task kể cả task rủi ro cao, trừ khi `task-executor` trả `BLOCKED` hoặc `NEEDS_CONTEXT`. Review dồn ở cuối:
    - `security-reviewer` trên diff toàn nhánh, và `plan-reviewer` đối chiếu theo ID.
    - `code-reviewer` (chế độ chỉ review) khi không chạy qua `subagent-driven-development`, vì skill đó đã review chất lượng từng task.
-3. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm commit, giả định/ruling, check chưa chạy.
+3. Gom finding HIGH → MEDIUM → LOW, hỏi người dùng trước khi sửa. Báo một lượt: task xong kèm `VERIFY`, task rủi ro cao (auth, dữ liệu, contract) kèm danh sách file đã đổi, giả định/ruling, check chưa chạy.

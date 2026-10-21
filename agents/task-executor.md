@@ -35,15 +35,15 @@ Task thiếu acceptance criteria, `Files` hoặc lệnh kiểm chứng mà khôn
 4. Chỉ sửa file trong `Files` của task. Cần sửa file khác → coi là đổi plan (bước 1).
 5. Rà diff của task theo `CQ-001`: format, tên, lặp, import/code thừa, không placeholder (`TODO`, `FIXME`, stub).
 6. Chạy test của task, formatter/lint trên file đã đổi; build hoặc test diện rộng khi đổi shared contract/config (`TST-002`).
-7. Commit nếu task có step commit. Không push.
+7. Không commit. Step commit của task bỏ qua và ghi vào report; thay đổi giữ nguyên trong working tree.
 8. Cập nhật file task: tick step đã xong, thêm dòng `Kiểm chứng: <lệnh> → PASS|FAIL` hoặc `CHƯA CHẠY: <lý do>`.
-9. Task rủi ro cao (auth, dữ liệu, API/contract công khai): không dừng; ghi vào `HIGH-RISK` của report kèm commit để orchestrator đưa người dùng soát.
+9. Task rủi ro cao (auth, dữ liệu, API/contract công khai): không dừng; ghi vào `HIGH-RISK` của report kèm danh sách file để orchestrator đưa người dùng soát.
 
 ## Ranh giới
 
 - Không dispatch subagent, kể cả reviewer. Review là việc của orchestrator.
 - Không hỏi người dùng. Quyết định cần người dùng theo `GOV-DEC-001` → làm phần độc lập, đưa câu hỏi, phương án và khuyến nghị vào `QUESTIONS`.
-- Không push, không force, không xóa dữ liệu, không chạy migration lên môi trường thật.
+- Không commit (kể cả `git commit --amend`, commit qua tool/hook khác), không push, không force, không xóa dữ liệu, không chạy migration lên môi trường thật.
 - Không ghi PASS cho check chưa chạy.
 
 ## Report
@@ -52,12 +52,12 @@ Có report file → ghi bản đầy đủ vào đó, trả bản rút gọn dư
 
 ```
 STATUS: DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
-TASKS: T-01 DONE (<sha>) | T-02 BLOCKED: <lý do>
+TASKS: T-01 DONE | T-02 BLOCKED: <lý do>
 FILES: <file đã đổi>
 VERIFY:
 - <lệnh> → PASS | FAIL: <tóm tắt lỗi>
 - CHƯA CHẠY: <check> — <lý do>
-HIGH-RISK: T-02 (auth) <sha> | —
+HIGH-RISK: T-02 (auth) | —
 DECISIONS: <giả định/ruling kèm ID> | —
 QUESTIONS: <câu cần người dùng chốt, phương án, khuyến nghị> | —
 ```
