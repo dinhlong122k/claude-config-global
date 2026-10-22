@@ -25,14 +25,14 @@ Skill này chạy ở **agent chính**: chỉ agent chính hội thoại đượ
 4. **Xử lý kết quả `task-planner`.**
    - `BLOCKED` → làm theo lý do trả về (thường là quay lại bước 1).
    - Còn mục trong "Câu hỏi mở" hoặc nhánh `TODO` trong flow → đưa người dùng trong **một** tin nhắn, quan trọng trước; cập nhật bằng cách giao lại `task-planner`.
-5. **Cổng 2 — duyệt plan.** Đưa người dùng: danh sách flow, nhánh/invariant mà `task-planner` tự bổ sung (đánh dấu "đề xuất"), các `GAP` trong "Trường hợp không liệt kê", và các task rủi ro cao. Người dùng nên dồn thời gian review vào bảng nhánh của flow, không phải task. Đây là cổng duyệt **cuối cùng trước khi code** — sau cổng này thực thi chạy liên tục.
+5. **Cổng 2 — duyệt plan.** Đưa người dùng §1 "Tóm tắt cho reviewer" của `docs/IMPLEMENTATION_PLAN.md` (đề xuất, `GAP`, `DEC` agent đề xuất, task rủi ro cao, `CHƯA XÁC ĐỊNH`) và trỏ §17 "Checklist duyệt". Người dùng nên dồn thời gian review vào bảng nhánh của flow, không phải task. Đây là cổng duyệt **cuối cùng trước khi code** — sau cổng này thực thi chạy liên tục.
 6. **Thực thi** — theo mục "Thực thi plan" trong `CLAUDE.md`: invoke `superpowers:subagent-driven-development` với `PLAN_FILE = docs/TASKS.md`, implementer là agent `task-executor` (nạp sẵn `developer-production`). Không có subagent tool → `superpowers:executing-plans` và agent chính tự áp dụng `developer-production`.
    - Chạy liên tục, không dừng giữa các task, kể cả task rủi ro cao; review dồn ở cuối (review toàn branch của skill đó). Đây là lựa chọn đã chốt của người dùng.
    - Mỗi implementer chỉ nhận brief của task mình; brief trỏ tới đúng flow/nhánh cần đọc, không nạp toàn bộ `docs/flows/`.
    - Mâu thuẫn giữa task và flow (cả hai cùng nói, nói khác nhau): skill tự phân xử với flow làm chuẩn và ghi ruling vào ledger — không dừng hỏi.
    - Plan im lặng không phải mâu thuẫn: không có dòng nào quyết định → gap (`PLAN-EXE-001`), không phân xử.
 7. **Sau khi chạy xong** — trước khi báo hoàn thành:
-   - Giao `plan-reviewer` đối chiếu plan/flow với code theo ID (`F-nn.Bk`, `I-k`, `REQ-*`), kể cả code ngoài plan.
+   - Giao `plan-reviewer` đối chiếu plan/flow với code theo ID (`F-nn.Bk`, `F-nn.Ik`, `REQ-*`), kể cả code ngoài plan.
    - Giao `task-planner` (chế độ cập nhật) các ruling trong ledger và gap người dùng đã trả lời để cập nhật flow và "Lịch sử thay đổi".
    - Báo người dùng một lượt: kết quả review cuối, các ruling đã đưa ra, và **các task rủi ro cao** (auth, dữ liệu, contract) kèm diff để họ soát lại vì chúng không có cổng dừng giữa chừng.
 
@@ -54,18 +54,14 @@ Design doc từ brainstorming nên trả lời được (nếu không, `task-pla
 | ID | Ý nghĩa | Ví dụ |
 | --- | --- | --- |
 | `REQ-nnn` | Requirement + acceptance criteria | `REQ-003` |
-| `C-nn` | Ràng buộc MUST / MUST NOT | `C-02` |
+| `C-nn` | Ràng buộc MUST / MUST NOT, gồm yêu cầu phi chức năng | `C-02` |
 | `NG-nn` | Non-goal | `NG-01` |
 | `F-nn` | Flow | `F-02` |
 | `F-nn.Sk` / `F-nn.Bk` / `F-nn.Ik` | Bước / nhánh / invariant của flow | `F-02.B3` |
 | `DEC-nnn` | Quyết định thiết kế (theo `GOV-DEC-001`) | `DEC-004` |
 | `T-nn` | Task | `T-05` |
+| `Q-nn` | Câu hỏi mở | `Q-01` |
 
 Tên test chứa ID nhánh hoặc invariant nó chứng minh, ví dụ `F02_B2_duplicate_callback_is_noop`, để `plan-reviewer` đối chiếu theo ID thay vì đọc hiểu tự do.
 
-## Giới hạn kích thước
-
-- `IMPLEMENTATION_PLAN.md` là index: giữ khoảng ≤ 200 dòng; chi tiết flow nằm trong `docs/flows/`.
-- Một flow > ~150 dòng → tách sub-flow.
-- Flow viết ở mức hợp đồng (bước, nhánh, điều kiện, side effect, invariant), không viết pseudo-code từng dòng.
-- Không chép lại convention đã có trong CLAUDE.md hoặc `developer-production`; chỉ tham chiếu ID rule.
+Giới hạn kích thước và cách đặt thông tin theo người đọc: trong `task-planner` (bên ghi artifact).

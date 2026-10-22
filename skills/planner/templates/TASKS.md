@@ -7,15 +7,19 @@
 **Goal:** <một câu: kết quả quan sát được khi mọi task xong>
 
 <!--
-Ràng buộc định dạng (do script task-brief của subagent-driven-development):
+Ràng buộc định dạng (script tách brief đọc trực tiếp file này):
 - Heading task phải khớp `## Task <N> (T-nn): ...`, N đánh số liên tục 1, 2, 3…
 - Mọi dòng từ heading Task N tới heading Task kế tiếp thuộc brief của task đó,
   nên KHÔNG đặt nội dung chung nào sau task cuối cùng. Checkpoint phase là một step trong task cuối phase.
+- Brief chỉ chứa khối task, không chứa phần đầu file này. Giá trị người thực thi cần để code
+  (lệnh, chữ ký, giá trị ràng buộc, input/mã) phải nằm trong khối task; phần còn lại chỉ trỏ ID.
+- Lặp lại khối `## Task N (T-nn)` cho mỗi task. Task là một slice dọc theo flow/nhánh (đủ các lớp nó đi qua),
+  là đơn vị nhỏ nhất có chu trình test riêng và đáng để reviewer chấp nhận/từ chối độc lập. Không đặt gì sau task cuối.
 -->
 
 ## Global Constraints
 
-Chép nguyên văn từ `C-*` và `NG-*` của plan, giá trị chính xác, mỗi dòng một mục. Mọi task ngầm bao gồm mục này.
+Chép nguyên văn từ `C-*` và `NG-*` của plan, giá trị chính xác, mỗi dòng một mục. Dành cho orchestrator và reviewer; brief không chứa mục này — task ghi giá trị ở `Ràng buộc`.
 
 - C-01 MUST <…>
 - NG-01 Không <…>
@@ -38,9 +42,14 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 **Wave:** <n>
 **Rủi ro:** cao (auth / dữ liệu / API–contract công khai) | thường
 **Boundary:** <stack> · <từng trigger> · <từng integration> — tên nguyên văn theo bảng routing/stack/integration, ví dụ `Java/Spring · API/HTTP · Database write, nhiều store · Kafka`
-**Flow / nhánh:** F-01.S1–S3, F-01.B1 — đọc `docs/flows/F-01-<slug>.md`: Bối cảnh, Concurrency & retry, Observability và các dòng này
+**Flow / nhánh:** F-01.S1–S3, F-01.B1 — đọc `docs/flows/F-01-<slug>.md`: Quyền truy cập, Validate input, Thay đổi dữ liệu, Idempotency và concurrency, Observability và các dòng này
 **Requirements:** REQ-001
+**Ràng buộc:** <C-* chạm task này, kèm giá trị nguyên văn, ví dụ `C-03 MUST NOT log card_number, email`> | —
 **Phụ thuộc:** — | Task N
+
+**Trạng thái trước / sau** (ngoài chữ ký code — chữ ký ở `Interfaces`):
+- Tiền điều kiện: <trạng thái repo/dữ liệu/config phải có, kèm task tạo ra, ví dụ "cột `orders.note` tồn tại (T-01)", "env `PAYMENT_URL` đọc qua `config.ts:30`"> | —
+- Hậu điều kiện: <trạng thái task sau được giả định, ví dụ "route `POST /orders` đã đăng ký", "migration `V12` đã có"> | —
 
 **Cases** (≤ 5 dòng, nhiều hơn → tách task; Loại: happy | fail | invariant; dòng đầu là happy; mã lấy từ "Mã kết quả" của flow).
 
@@ -48,6 +57,8 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 | --- | --- | --- | --- | --- |
 | F-01.S3 | happy | `{sku:"A1",qty:2}` | `201 ORDER_CREATED`; 1 bản ghi status=NEW | `F01_S_happy_path_<…>` |
 | F-01.B1 | fail | `{sku:"A1",qty:0}` | `400 INVALID_QTY`; không bản ghi nào | `F01_B1_<…>` |
+
+**Dữ liệu test:** <fixture/seed cần tạo: path + giá trị chính xác, ví dụ `tests/fixtures/orders.ts` thêm `productA1 {sku:"A1", stock:5}`> | dùng lại `<path:line>` | —
 
 **Files** (mỗi file thuộc đúng một task):
 - Create: `exact/path/new_file.ext`
@@ -60,12 +71,13 @@ Mỗi REQ, mỗi nhánh `B`, mỗi invariant `I` xuất hiện ít nhất một 
 - Consumes: <tên + chữ ký chính xác từ task trước, ví dụ `OrderRepository.findForUpdate(id: OrderId): Order | null` (Task 1)> | —
 - Produces: <tên + chữ ký chính xác task sau sẽ dùng> | —
 
-**Tái dùng:** `<symbol>` (`path:line`) — <validate / map lỗi / auth …> | —
+**Tái dùng:** `<symbol>` (`path:line`) — <validate / map lỗi / auth / logger …> | —
 **Không làm:** <việc dễ tiện tay làm khi chạm các file này, vd không đổi response endpoint cũ; nhánh F-01.B4 thuộc T-04> | —
 
 **Done khi** (mọi dòng đạt; lệnh thật của repo):
 - Test (mọi test trong Cases): `<lệnh>` → PASS
 - Lint/build: `<lệnh>` → exit 0 | CHƯA XÁC ĐỊNH: <lý do>
+- Hoàn tác (chỉ task rủi ro cao đổi schema/dữ liệu/config): <cách, ví dụ down migration `V12__down.sql`>; `<lệnh>` → exit 0 | —
 - Docs: `<file#mục>` khớp <chữ ký / giá trị / lệnh cụ thể>; lệnh lint doc nếu repo có | —
 - Manual: <việc kiểm bằng tay, nếu có> | —
 
@@ -96,8 +108,5 @@ Expected: PASS
 
 - [ ] **Step 6: Checkpoint phase <tên> (chỉ task cuối phase — bỏ step này ở task khác)**
 
-Run: `<lệnh full test của repo>` và `<lệnh build>`
+Run: `<lệnh full test của repo>` và `<lệnh build>` (chép từ §16 plan)
 Expected: PASS — mọi flow của phase chạy end-to-end
-
-<!-- Lặp lại khối "## Task N (T-nn)" cho mỗi task. Task là một slice dọc theo flow/nhánh (đủ các lớp nó đi qua),
-     là đơn vị nhỏ nhất có chu trình test riêng và đáng để reviewer chấp nhận/từ chối độc lập. Không đặt gì sau task cuối. -->

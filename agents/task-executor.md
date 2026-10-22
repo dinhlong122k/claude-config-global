@@ -31,7 +31,7 @@ Plan im lặng về một trường hợp → theo `PLAN-EXE-001` của skill, k
 
 ## Mỗi task
 
-1. Trước khi code: kiểm `Consumes`, `Tái dùng`, `Modify` có thật trong code với đúng chữ ký. Lệch → phân loại theo `plan-execution` của skill (nhỏ / gap / lớn). Không sửa plan.
+1. Trước khi code: kiểm `Consumes`, `Tái dùng`, `Modify` và Tiền điều kiện có thật trong code với đúng chữ ký. Lệch → phân loại theo `plan-execution` của skill (nhỏ / gap / lớn). Không sửa plan.
 2. Chọn rule theo trigger thật của thay đổi (routing của skill), không nạp toàn bộ catalog.
 3. Làm theo steps của task (TDD: test fail → implement → test pass). Tên test chứa ID nhánh/invariant. Không làm việc trong mục `Không làm` của task.
 4. Chỉ sửa file trong `Files` của task. Cần sửa file khác → coi là gap (bước 1).
