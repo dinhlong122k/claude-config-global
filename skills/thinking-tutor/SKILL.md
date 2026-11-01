@@ -1,5 +1,5 @@
 ---
-name: tutor-tu-duy
+name: thinking-tutor
 description: Use when the user wants to learn or understand a technical topic, is stuck, asks for a tutor, or wants help choosing the best solution or design while still understanding why.
 ---
 
