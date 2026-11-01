@@ -1,153 +1,108 @@
 # F-nn <Tên flow>
 
-> Requirements: REQ-xxx, REQ-yyy | Ràng buộc liên quan: C-xx | Rủi ro: cao / thường
-> Flow là nguồn sự thật cho hành vi. Thuật ngữ theo §3 của plan.
+> Requirements: REQ-xxx | Ràng buộc: C-xx | Rủi ro: cao / thường
+> Nguồn sự thật cho hành vi; thuật ngữ theo §2 plan. Mục lõi luôn có; mục `(điều kiện)` chỉ có khi áp dụng, không thì bỏ hẳn. Chỉ ghi lý do một dòng khi bỏ mục mà trigger routing tương ứng có mặt. Giá trị đến từ rule owner ghi kèm ID rule (vd `REL-001`).
 
 ## Bối cảnh
 
 - Actor: <user / service / job>
 - Trigger: <METHOD /path | topic | schedule>
-- Precondition: <trạng thái bắt buộc trước khi chạy; vi phạm → nhánh `B`>
-- Transaction boundary: <bước nào nằm chung transaction, ví dụ S2–S4>
+- Precondition: <trạng thái bắt buộc; vi phạm → nhánh `B`>
+- Transaction boundary: <vd S2–S4>
 
-## Quyền truy cập
+## Quyền truy cập (điều kiện: trigger có caller — API/HTTP, webhook/callback, hành động admin)
 
-Bỏ nếu trigger không có caller (job nội bộ); ghi lý do một dòng.
+- Được gọi: <role/scope/điều kiện sở hữu>
+- Kiểm ở: <cơ chế hiện có, `path:line`>
+- Không đủ quyền: <nhánh `B`>; che giấu tài nguyên có tồn tại: có / không
 
-- Được gọi: <role/scope/điều kiện sở hữu, ví dụ `role=CUSTOMER` và `order.user_id = caller`>
-- Kiểm ở: <middleware/guard/bước S, `path:line` của cơ chế hiện có>
-- Không đủ quyền: <nhánh `B`> — không tiết lộ tài nguyên tồn tại hay không: <có / không áp dụng>
+## Validate input (điều kiện: trigger có input)
 
-## Validate input
+Kiểm ở biên, trước mọi ghi; mỗi rule sai trỏ đúng một `B`.
 
-Kiểm ở biên, trước mọi ghi. Mỗi rule sai trỏ đúng một nhánh `B`; mã nằm ở "Mã kết quả". Bỏ nếu trigger không có input; ghi lý do một dòng.
-
-| Field | Kiểu / bắt buộc | Rule | Sai → nhánh |
+| Field | Kiểu / bắt buộc | Rule | Sai → |
 | --- | --- | --- | --- |
-| `qty` | int, bắt buộc | 1 ≤ qty ≤ 100 | B1 |
-| `sku` | string, bắt buộc | khớp `^[A-Z0-9]{2,20}$`, tồn tại trong `products` | B1 / B2 |
+| `<field>` | <…> | <…> | B1 |
 
-Field thừa / không biết: <bỏ qua | 400 `UNKNOWN_FIELD` (B?) | theo validator hiện có `path:line`>
+Field thừa: <bỏ qua | nhánh `B` | theo validator `path:line`>
 
 ## Các bước
 
-Mọi điều kiện rẽ nhánh phải có dòng `B` tương ứng. Nhánh agent tự thêm (người dùng chưa nói) ghi `(đề xuất)` để duyệt ở cổng 2. Nhánh chưa rõ ghi `TODO` và đưa vào Câu hỏi mở.
+Mọi điều kiện rẽ nhánh có dòng `B`. Nhánh agent tự thêm ghi `(đề xuất)`; chưa rõ ghi `TODO` + Câu hỏi mở.
 
 | # | Bước | Điều kiện rẽ nhánh → nhánh | Kết quả / side effect |
 | --- | --- | --- | --- |
-| S1 | <bước> | <điều kiện> → B1 | <kết quả happy path> |
-| S2 | <bước> | — | <…> |
+| S1 | <…> | <…> → B1 | <…> |
 
-## Diagram
+## Diagram (điều kiện: ≥ 3 participant hoặc ≥ 3 nhánh `B`)
 
-Bắt buộc. Actor → entry point → service → store/integration; happy path đủ bước, mỗi `B` là một nhánh `alt`/`else` nhãn `Bk` kèm mã trả về.
-
-```mermaid
-sequenceDiagram
-    actor U as User
-    participant API as POST /orders
-    participant S as OrderService
-    participant DB as orders
-    U->>API: {sku, qty}
-    alt B1 qty <= 0
-        API-->>U: 400 INVALID_QTY
-    else S1–S2 hợp lệ
-        API->>S: create(sku, qty)
-        S->>DB: insert status=NEW
-        API-->>U: 201 ORDER_CREATED
-    end
-```
+`sequenceDiagram`: actor → entry point → service → store/integration; happy path đủ bước; mỗi `B` là một `alt`/`else` nhãn `Bk` kèm mã trả về.
 
 ## Mã kết quả
 
-Bắt buộc. Mỗi `S` kết thúc và mỗi `B` có đúng một dòng. Không phải HTTP (job/event) → ghi status/event tương ứng.
+Mỗi `S` kết thúc và mỗi `B` đúng một dòng. Không phải HTTP → status/event tương ứng.
 
 | Mã | HTTP/status | Bước/nhánh | Body/payload |
 | --- | --- | --- | --- |
-| `ORDER_CREATED` | 201 | S2 | `{id, status:"NEW"}` |
-| `INVALID_QTY` | 400 | B1 | `{code, message}` |
+| `<CODE>` | <…> | S<n> / B<n> | <…> |
 
 ## Nhánh lỗi / biên
 
-| # | Khi nào | Hành vi | Trạng thái dữ liệu sau đó | Mã |
+| # | Khi nào | Hành vi | Dữ liệu sau đó | Mã |
 | --- | --- | --- | --- | --- |
-| B1 | <…> | <…> | không đổi / <…> | <mã trong "Mã kết quả"> |
+| B1 | <…> | <…> | không đổi / <…> | <mã> |
 
 ## Trường hợp không liệt kê
 
-Bắt buộc. Mặc định cho input/lỗi không có trong bảng nhánh: <dùng `<handler/validator hiện có, path:line>` | giữ hành vi hiện có | GAP (đã có trong Câu hỏi mở)>
+Mặc định cho input/lỗi ngoài bảng nhánh: <dùng `<handler/validator, path:line>` | giữ hành vi hiện có | GAP (đã có trong Câu hỏi mở)>
 
-## Ví dụ happy path
+## Ví dụ happy path (điều kiện: contract API/event client ngoài dùng)
 
-Một cặp đầy đủ, giá trị thật, khớp dòng happy của "Mã kết quả". Không phải HTTP → message/event vào và trạng thái dữ liệu trước/sau.
+Một cặp request/response (hoặc message vào + dữ liệu trước/sau) với giá trị thật, khớp dòng happy của "Mã kết quả".
 
-```http
-POST /orders
-Authorization: Bearer <token CUSTOMER>
-Content-Type: application/json
+## Thay đổi dữ liệu (điều kiện: có ghi, đọc có khóa hoặc ghi đồng thời)
 
-{"sku":"A1","qty":2}
-
-HTTP/1.1 201 Created
-{"id":"ord_123","status":"NEW"}
-```
-
-## Thay đổi dữ liệu
-
-Mọi ghi và mọi đọc có khóa. Bỏ nếu flow chỉ đọc không khóa; ghi lý do một dòng. Thay đổi schema nằm ở §9 plan.
+Schema nằm ở §8 plan.
 
 | Store | Thao tác | Field / điều kiện | Bước | Trong transaction |
 | --- | --- | --- | --- | --- |
-| `orders` | insert | `status=NEW`, `user_id=caller` | S2 | có (S2–S3) |
-| `stock` | select for update → update | `qty -= :qty` where `sku=:sku` | S3 | có |
+| `<store>` | <insert / update / select for update> | <…> | S<n> | có / không |
 
-## Side effect và event
+## Side effect và event (điều kiện: event, mail, webhook, cache, Kafka/MinIO)
 
-Bỏ nếu flow không phát event, gửi mail, gọi webhook hay ghi cache; ghi lý do một dòng.
-
-| Tên (topic / event / cache key) | Bước | Payload / giá trị | Thời điểm so với commit | Phát thất bại → |
+| Tên (topic / event / key) | Bước | Payload / giá trị | Thời điểm so với commit | Phát thất bại → |
 | --- | --- | --- | --- | --- |
-| `order.created` | S4 | `{orderId, userId, total}` | sau commit, qua outbox | retry outbox; response không đổi |
+| `<name>` | S<n> | <…> | <trước / sau commit, outbox — DATA-002> | <…> |
 
-## Gọi ngoài
+## Gọi ngoài (điều kiện: gọi hệ thống ngoài process)
 
-Bỏ nếu flow không gọi hệ thống ngoài process; ghi lý do một dòng. Danh mục phụ thuộc nằm ở §10 plan.
+Danh mục phụ thuộc ở §8 plan.
 
-| Hệ thống / endpoint | Bước | Timeout | Retry (số lần, backoff, điều kiện) | Lỗi / hết retry → nhánh |
+| Hệ thống / endpoint | Bước | Timeout | Retry (lần, backoff, điều kiện) | Lỗi / hết retry → |
 | --- | --- | --- | --- | --- |
-| `payment-api POST /charges` | S3 | 3 s | 2 lần, 200 ms ×2, chỉ 5xx/timeout | B4 |
+| `<system op>` | S<n> | <…> | <…> | B<n> |
 
-## Trạng thái
+## Trạng thái (điều kiện: có lifecycle)
 
-Bỏ nếu flow không có lifecycle; ghi lý do một dòng.
-
-```mermaid
-stateDiagram-v2
-    [*] --> STATE_A
-    STATE_A --> STATE_B: S3 thành công
-    STATE_A --> STATE_FAILED: B2
-```
-
-Chuyển trạng thái bị cấm: <A → C, …>. Terminal: <…>.
+`stateDiagram-v2` với nhãn chuyển là bước/nhánh. Chuyển bị cấm: <…>. Terminal: <…>.
 
 ## Invariants
 
-- I1 <điều luôn đúng, ví dụ: mỗi key chỉ được xử lý đúng một lần>
+- I1 <điều luôn đúng>
 
-## Idempotency và concurrency
+## Idempotency và concurrency (điều kiện: nhận lặp, ghi đồng thời, retry từ phía gọi)
 
-Bỏ từng dòng không áp dụng kèm lý do.
+Chỉ ghi dòng áp dụng.
 
-- Idempotency: <key (header/field) — lần lặp trả gì — lưu key bao lâu> | không áp dụng: <vì sao>
-- Đồng thời: <hai request cùng tài nguyên → kết quả của mỗi bên, nhánh `B`>
-- Khóa: <optimistic `version` | `select for update` | unique constraint `<tên>`>
-- Retry từ phía gọi: <an toàn vì … | không an toàn → nhánh `B`>
+- Idempotency: <key — lần lặp trả gì — lưu bao lâu>
+- Đồng thời: <hai request cùng tài nguyên → kết quả mỗi bên, nhánh `B`>
+- Khóa: <optimistic `version` | `select for update` | unique `<tên>`>
+- Retry từ phía gọi: <an toàn vì … | không → nhánh `B`>
 
-## Observability
+## Observability (điều kiện: log/metric/span mới ngoài mặc định `OBS-*`)
 
-Không log dữ liệu thuộc `C-*` loại bảo mật/dữ liệu nhạy cảm. Dùng logger/metric hiện có (`path:line`).
+Không log dữ liệu thuộc `C-*` bảo mật. Dùng logger/metric hiện có (`path:line`).
 
-| Bước / nhánh | Log (level, field) | Metric (tên, tag) | Trace span |
+| Bước / nhánh | Log (level, field) | Metric (tên, tag) | Span |
 | --- | --- | --- | --- |
-| S2 | info `order_created` `{orderId}` | `orders_created_total` | `order.create` |
-| B4 | warn `payment_failed` `{orderId, code}` | `payment_errors_total{code}` | — |
+| S<n> / B<n> | <…> | <…> | <…> |
