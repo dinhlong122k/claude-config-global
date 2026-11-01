@@ -12,6 +12,10 @@ Ghi quyết định quan trọng bằng `DEC-...` khi nó giúp người khác h
 
 **CRITICAL khi xét một phương án OPTIONAL.** `OPTIONAL` không mặc nhiên là yêu cầu và không tạo nghĩa vụ hỏi người dùng. Chỉ thêm khi cần cho hành vi được yêu cầu, có bằng chứng rủi ro, hoặc đã có convention tương ứng. Nếu phương án làm tăng đáng kể phạm vi, chi phí, quyền truy cập hoặc nghĩa vụ vận hành, áp dụng `GOV-DEC-001`. Không triển khai toàn bộ optional chỉ vì đã đọc một module.
 
+## GOV-OPT-002 — Optional by domain
+
+**CRITICAL when encountering a rule `OPTIONAL — domain <name>`.** A domain is enabled when the plan or the repo's `CLAUDE.md`/`AGENTS.md`/`README` explicitly states the project belongs to that domain; once enabled, the domain rule applies as CRITICAL for its trigger. Indirect signals only (field names, tables, dependencies) keep it off and are reported per `GOV-DEC-001`. Current domain: `financial`.
+
 ## GOV-OWN-001 — Một owner cho mỗi rule
 
 **CRITICAL khi tạo hoặc sửa skill/rule.** Quy tắc chung được định nghĩa ở architecture hoặc controls; integration bổ sung semantics riêng; stack adapter chỉ ra cách áp dụng bằng công nghệ cụ thể; routing không lặp nội dung rule. Khi chuyển owner, cập nhật link trong cùng thay đổi.

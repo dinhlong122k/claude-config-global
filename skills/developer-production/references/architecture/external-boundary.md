@@ -6,7 +6,7 @@
 
 ## ARC-EXT-002 — Contract operation
 
-**CRITICAL khi gửi/nhận request, file hoặc message.** Ghi input/output, side effect, idempotency, timeout/deadline, trạng thái kết quả không rõ, error mapping và dữ liệu được phép log. Message handler phải nêu ack/commit, invalid payload, duplicate và poison message.
+**CRITICAL khi gửi/nhận request, file hoặc message.** Ghi input/output, side effect, idempotency, timeout/deadline, trạng thái kết quả không rõ, error mapping (theo `EXC-003`, `EXC-004`) và dữ liệu được phép log. Message handler phải nêu ack/commit, invalid payload, duplicate và poison message.
 
 ## ARC-EXT-O01 — Client wrapper dùng chung
 

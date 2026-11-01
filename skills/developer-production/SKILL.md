@@ -11,7 +11,7 @@ The plan/task is the only source of scope. This skill defines how to do that sco
 
 1. **Follow the plan exactly.** Do everything it lists, nothing it doesn't. Every change must trace to a plan step, acceptance criterion, or listed file. Worthwhile work outside the plan goes in the report, not the code.
 2. **Plan files are read-only.** Only tick finished steps and record the `Kiểm chứng` line. Plan missing, contradictory, or diverging from reality → stop the dependent part, report it (agent chính: ask) per [decision-gate](references/governance/decision-gate.md). Never fill gaps by guessing.
-3. **Rules by trigger.** Read only references whose trigger appears in the change, via [routing](references/routing.md). `CRITICAL` rules constrain how to build planned work; they never justify new features. `OPTIONAL` items are skipped unless the plan requires them.
+3. **Rules by trigger.** Read only references whose trigger appears in the change, via [routing](references/routing.md). `CRITICAL` rules constrain how to build planned work; they never justify new features. `OPTIONAL` items are skipped unless the plan requires them or their domain is active per `GOV-OPT-002`.
 4. **Surgical edits.** Touch only files in the task. No renames, reformatting, or restructuring of unrelated code.
 5. **Never report pass for a check not run.** Take format/lint/build/test commands from the repo; do not invent them.
 

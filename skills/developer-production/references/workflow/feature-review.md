@@ -22,7 +22,7 @@ Chỉ ghi control có trigger và optional được cân nhắc thực sự. H�
 | --- | --- | --- | --- | --- | --- |
 | ... | ... | ... | ... | ... | ... |
 
-Với message, ghi schema/key/group, commit point, invalid payload, retry, quarantine/DLT owner và xử lý khi gửi DLT thất bại. Với file/object, ghi partial state, checksum/size, cleanup và reconciliation. Với rate limit, ghi quota/scope/429/store outage.
+Với message, ghi schema/key/group, commit point, invalid payload, retry, quarantine/DLT owner và xử lý khi gửi DLT thất bại. Với file/object, ghi partial state, checksum/size, cleanup và reconciliation. Với rate limit, ghi quota/scope/429/store outage. Với client gọi hệ thống ngoài, ghi các dạng partner báo lỗi, mapper hai chiều, bảng map lỗi kèm dòng mặc định, và dòng nào được trả message gốc cho caller (theo `EXC-001`–`EXC-004`).
 
 ## Bàn giao
 

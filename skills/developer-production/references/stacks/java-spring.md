@@ -6,10 +6,11 @@
 
 | ID | Cách áp dụng |
 | --- | --- |
-| JAVA-001 | Bind endpoint, credential reference, timeout/deadline, pool, topic/bucket/key namespace vào typed properties có validation. Chỉ những property có trigger mới bắt buộc ở startup; config theo environment và không hard-code secret. |
-| JAVA-002 | Client/bean/listener/stream có lifecycle và graceful shutdown; test property binding, negative path và resource close. |
+| JAVA-001 | `RUN-001`: bind endpoint, credential reference, timeout/deadline, pool, topic/bucket/key namespace vào `@ConfigurationProperties` + `@Validated`; dùng `Duration`/`DataSize` cho đơn vị. Chỉ những property có trigger mới bắt buộc ở startup; config theo profile/environment và không hard-code secret. |
+| JAVA-002 | `RUN-002`/`RUN-003`: `server.shutdown=graceful` + `spring.lifecycle.timeout-per-shutdown-phase`; client/bean/listener/stream có lifecycle (`SmartLifecycle`/`@PreDestroy`); Actuator liveness/readiness group, không đưa DB vào liveness. Test property binding, negative path và resource close. |
 | JAVA-003 | `@Transactional` chỉ bao resource do transaction manager quản lý; xác nhận commit/rollback và side effect order. |
 | JAVA-004 | Nếu dùng Spring Kafka, kiểm tra deserialization error xảy ra trước listener và error handler/DLT disposition phù hợp version. |
+| JAVA-005 | `EXC-001`–`EXC-005`: mỗi client có package riêng gồm DTO request/response/error (record), mapper thuần (tay viết hoặc MapStruct với `unmappedTargetPolicy = ERROR`), enum bảng map lỗi. `RestClient`: `defaultStatusHandler`/`onStatus` riêng từng client, đọc error body an toàn (giới hạn size, bắt lỗi parse) rồi kiểm tra cả body của response 2xx; `WebClient`: `onStatus` + `ExchangeFilterFunction`. Bọc `ResourceAccessException`/`WebClientRequestException`/`SocketTimeoutException` thành exception typed của client, giữ `cause`. `@RestControllerAdvice` map exception typed theo internal code, lấy custom message qua `MessageSource`; field message gốc chỉ vào log/MDC. |
 
 ## OPTIONAL — cân nhắc theo nhu cầu
 

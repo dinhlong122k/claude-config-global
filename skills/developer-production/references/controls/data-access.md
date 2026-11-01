@@ -12,6 +12,10 @@
 
 **CRITICAL khi ghi đồng thời có thể phá invariant.** Chọn constraint, optimistic version, row lock hoặc pattern phù hợp; test race/conflict. Cache/distributed lock không thay DB invariant.
 
+## DAL-004 — Query giới hạn thời gian và khối lượng
+
+**CRITICAL khi thêm query hoặc thao tác dữ liệu hàng loạt.** Mọi query có statement/query timeout phù hợp deadline `REL-001`. Update/delete hàng loạt chạy theo batch có giới hạn, commit từng batch, không khóa bảng lâu. Không `SELECT *` khi chỉ cần vài cột trên bảng lớn; đọc kết quả lớn bằng cursor/stream hoặc keyset paging theo `RUN-005`. Transaction ngắn, không chờ input hay external call bên trong.
+
 ## DAL-O01 — Cache mới
 
 **OPTIONAL.** Cân nhắc khi thêm cache tối ưu query; nếu dùng Redis, đọc catalog Redis cache.
@@ -19,5 +23,13 @@
 ## DAL-O02 — Đổi concurrency model
 
 **OPTIONAL.** Cân nhắc khi đổi sang virtual threads/reactive hoặc tương đương; cần benchmark và rà blocking client.
+
+## DAL-O03 — Read replica
+
+**OPTIONAL.** Cân nhắc khi tải đọc vượt primary; phải chấp nhận replication lag, không đọc replica ngay sau khi ghi (read-your-writes) và không dùng replica cho kiểm tra invariant.
+
+## DAL-O04 — Partition/archive dữ liệu
+
+**OPTIONAL.** Cân nhắc khi bảng tăng không giới hạn (log, event, giao dịch); chốt khóa partition, chính sách archive/xóa theo retention `SEC-003` và ảnh hưởng tới query hiện có.
 
 **Bằng chứng:** query plan/benchmark khi liên quan, concurrency test và cấu hình pool.
