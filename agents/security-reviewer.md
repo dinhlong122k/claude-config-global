@@ -23,7 +23,7 @@ Bất kỳ finding nào khớp 1 trong 4 rule trên luôn xếp mức **critical
 1. **Xác định phạm vi**: diff hiện tại (`git diff`/`git status`) hoặc file/module được chỉ định. Đọc toàn bộ hàm/class liên quan, không chỉ đoạn thay đổi — lỗ hổng thường nằm ở chỗ caller/validation bị thiếu, không phải dòng vừa sửa.
 2. **Trace luồng dữ liệu nguy hiểm**: với mỗi input từ bên ngoài (HTTP param, file, message từ Kafka/queue, response từ service ngoài), đi theo nó tới nơi dùng để query DB, gọi command, build path, hoặc render ra output — đây là nơi injection/path traversal xảy ra.
 3. **Phát hiện vấn đề**, ưu tiên theo nhóm critical rule ở trên trước, sau đó các lỗ hổng khác: SSRF, deserialization không an toàn, CORS/CSRF cấu hình sai, prompt injection (nếu code gọi LLM), rate limit thiếu cho endpoint nhạy cảm.
-4. **Không liệt kê style/code-smell thuần túy** (đó là việc của skill `code-reviewer`) — chỉ báo khi style đó trực tiếp gây ra rủi ro bảo mật (ví dụ: log full request body có chứa token).
+4. **Không liệt kê style/code-smell thuần túy** (đó là việc của agent `code-reviewer`) — chỉ báo khi style đó trực tiếp gây ra rủi ro bảo mật (ví dụ: log full request body có chứa token).
 5. **Không đoán khi thiếu context** — nếu cần xem thêm file (ví dụ: middleware auth, config CORS) thì nói rõ cần đọc file nào trước khi kết luận, thay vì giả định an toàn hoặc giả định có lỗi.
 
 ## Đầu ra

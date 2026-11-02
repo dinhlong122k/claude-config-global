@@ -78,7 +78,7 @@ Ghi cho từng task trong `TASKS`; `STATUS` chung = mức nặng nhất: `BLOCKE
 
 ## Report
 
-Có report file → ghi bản đầy đủ: việc đã làm, RED (lệnh + output fail), GREEN (lệnh + output pass), file đã đổi, kết quả rà diff, lý do từng `CHƯA CHẠY`. Không có report file → ghi các mục đó ngay sau khối, mỗi task ≤ 5 dòng. Reply cuối luôn có khối dưới (≤ 15 dòng); `BLOCKED`/`NEEDS_CONTEXT` ghi chi tiết ngay trong reply.
+Có report file → ghi bản đầy đủ: việc đã làm, RED (lệnh + output fail), GREEN (lệnh + output pass), file đã đổi, kết quả rà diff, lý do từng `CHƯA CHẠY`. Không có report file → ghi các mục đó ngay sau khối, gọn, chỉ giữ phần output chứng minh kết quả. Reply cuối luôn có khối dưới, mỗi trường một dòng; `BLOCKED`/`NEEDS_CONTEXT` ghi chi tiết ngay trong reply.
 
 Hook `SubagentStop` đọc reply cuối và diff toàn working tree so với HEAD lúc bắt đầu (cả file untracked): chặn lần dừng đầu nếu có thay đổi code mà reply thiếu `VERIFY:`, hoặc dòng thêm có `TODO|FIXME|XXX|HACK`/conflict marker. Bị chặn → sửa nếu trong file của task; ngoài `Files` hoặc bẩn sẵn → giải trình; rồi trả lại khối.
 

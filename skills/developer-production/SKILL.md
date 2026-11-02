@@ -31,7 +31,7 @@ Before finishing, for each new class/file/function/param/config, name the plan l
 
 ## Clean code
 
-Intent-revealing names; short single-purpose functions; few params; no deep nesting, magic values, duplicated logic, or swallowed errors; comments explain why only. After tests pass, refactor only code you wrote or changed in task files (behavior unchanged), then rerun tests.
+Follow `CQ-001`–`CQ-003`. After tests pass, refactor only code you wrote or changed in task files (behavior unchanged), then rerun tests.
 
 ## Workflow
 

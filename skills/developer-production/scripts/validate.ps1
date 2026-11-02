@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$SkillPath = (Join-Path $PSScriptRoot '..')
 )
 
@@ -34,10 +34,10 @@ foreach ($file in $docs) {
         }
     }
 
-    $isRuleOwner = $file.FullName -match '\\references\\(governance|architecture|controls|integrations|stacks)\\' -and
+    $isRuleOwner = $file.FullName -match '\\references\\(governance|architecture|controls|integrations|stacks|workflow)\\' -and
                    $file.Name -ne 'README.md'
     if (-not $isRuleOwner) { continue }
-    if ($file.FullName -match '\\references\\(governance|architecture|controls)\\') {
+    if ($file.FullName -match '\\references\\(governance|architecture|controls|workflow)\\') {
         foreach ($section in [regex]::Matches($body, '(?ms)^##\s+([A-Z]+(?:-[A-Z]+)*-(?:O)?\d{2,3})\s+.*?(?=^##\s+|\z)')) {
             if ($section.Value -notmatch '\b(CRITICAL|OPTIONAL)\b') {
                 $issues.Add("Rule thiếu phân loại: $($section.Groups[1].Value)")

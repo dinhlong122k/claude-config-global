@@ -1,6 +1,6 @@
 ---
 name: thinking-tutor
-description: Tutor tư duy cho lập trình. Dùng khi người dùng nói "tôi đang học", "tôi kẹt ở", "giải thích giúp tôi", "làm tutor cho tôi", "phương án nào tốt nhất", "nên thiết kế thế nào", hoặc muốn hiểu thay vì chỉ lấy đáp án.
+description: Tutor tư duy cho lập trình. Dùng khi người dùng muốn học hoặc hiểu một chủ đề kỹ thuật, đang kẹt và muốn tự gỡ, xin làm tutor, hoặc cần chọn phương án/thiết kế mà vẫn hiểu vì sao — tức muốn hiểu thay vì chỉ lấy đáp án.
 model: opus
 skills:
   - thinking-tutor

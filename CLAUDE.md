@@ -8,11 +8,11 @@ In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the re
 
 If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
 <!-- CODEGRAPH_END -->
-## CodeGraph — bắt buộc dùng tự động
+## CodeGraph — dùng mặc định
 
 Bổ sung cho block trên (block đó do `codegraph` CLI quản lý, không sửa tay). Khi repo có `.codegraph/`, áp dụng mặc định:
 
-- Mọi câu hỏi về code (how/where/why, flow, bug, impact) và trước khi sửa code: gọi `codegraph_explore` TRƯỚC với tên symbol/file để xem source và blast radius. Không grep/Glob/Read để khám phá khi chưa gọi nó. Tool bị deferred → load bằng ToolSearch `select:mcp__codegraph__codegraph_explore`; không có MCP → dùng shell.
+- Mọi câu hỏi về code (how/where/why, flow, bug, impact) và trước khi sửa code: gọi `codegraph_explore` trước với tên symbol/file để xem source và blast radius. Không grep/Glob/Read để khám phá khi chưa gọi nó. Tool bị deferred → load bằng ToolSearch `select:mcp__codegraph__codegraph_explore`; không có MCP → dùng shell.
 - Tin kết quả codegraph, không grep lại để kiểm chứng.
 - Read/Grep trực tiếp chỉ khi: file không được index (config, docs, yml, properties), cần chi tiết codegraph chưa trả về, hoặc file vừa sửa trong session (index lag ~1s).
 - Không spawn subagent chỉ để tìm/đọc code.

@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Lập kế hoạch triển khai một file cho feature hoặc thay đổi hệ thống khi yêu cầu còn ở mức nghiệp vụ và không chạy skill planner (brainstorming → task-planner). Ghi docs/IMPLEMENTATION_PLAN.md gồm scope, contract, flow, task và test có ID để task-executor và plan-reviewer dùng trực tiếp.
+description: Lập kế hoạch triển khai cho feature hoặc thay đổi hệ thống khi yêu cầu còn ở mức nghiệp vụ và không chạy skill planner (brainstorming → task-planner). Ghi docs/IMPLEMENTATION_PLAN.md và docs/TASKS.md theo template của skill planner, có ID để task-executor và plan-reviewer dùng trực tiếp.
 tools: Read, Grep, Glob, Write, mcp__codegraph__codegraph_explore
 model: opus
 ---
@@ -28,27 +28,10 @@ Bạn khảo sát repository và viết một kế hoạch đủ rõ để `task
 
 ## Đầu ra
 
-Ghi `docs/IMPLEMENTATION_PLAN.md` (tạo thư mục nếu chưa có):
+Ghi theo template `~/.claude/skills/planner/templates/` (danh mục mục, không phải form điền đủ; mục `(điều kiện: …)` chỉ có khi điều kiện đúng), tạo `docs/` nếu chưa có:
 
-1. Title, status
-2. Problem statement
-3. Repository baseline (`path:line`)
-4. Scope (`REQ-nnn` + acceptance criteria), ràng buộc `C-nn`, non-goals `NG-nn`
-5. Giả định, câu hỏi mở (gồm mọi `GAP`)
-6. Design: domain/state, contract, persistence/migration, error handling, observability (không log PII)
-7. Flow `F-nn`: bảng bước `S1..`, nhánh `B1..`, invariant `I1..`, và một dòng **Trường hợp không liệt kê:** dùng `<handler hiện có, path:line>` | giữ hành vi hiện có | `GAP`
-8. Task, mỗi task dạng:
-   ```
-   ## Task N (T-nn) <tên>
-   Truy vết: REQ-…, F-nn.Sk/Bk/Ik
-   Files: Create/Modify <path>
-   Tái dùng: <symbol, path:line> | không
-   Không làm: <việc gần kề nhưng ngoài task> | không
-   Acceptance: <điều kiện kiểm chứng được>
-   Test: <tên test chứa ID, ví dụ F02_B2_duplicate_is_noop>
-   ```
-9. Verification matrix REQ → test
-10. Rollout/rollback, chỉ khi có migration hoặc feature flag
+- `docs/IMPLEMENTATION_PLAN.md` theo `IMPLEMENTATION_PLAN.md`: flow gọn ở §6 (`### F-nn <tên>`), mỗi flow có dòng **Trường hợp không liệt kê**.
+- `docs/TASKS.md` theo `TASKS.md`: heading `## Task <N> (T-nn): <tên>`, đủ trường lõi ghi trong comment đầu file (`Boundary`, `Cases`, `Files`, `Done khi`, `Steps`, …). Không ghi tên skill/agent trong file này.
 
 ## Tự kiểm trước khi kết thúc
 
