@@ -10,7 +10,7 @@ Ghi quyết định quan trọng bằng `DEC-...` khi nó giúp người khác h
 
 ## GOV-OPT-001 — Optional theo nhu cầu
 
-**CRITICAL khi xét một phương án OPTIONAL.** `OPTIONAL` không mặc nhiên là yêu cầu và không tạo nghĩa vụ hỏi người dùng. Chỉ thêm khi cần cho hành vi được yêu cầu, có bằng chứng rủi ro, hoặc đã có convention tương ứng. Nếu phương án làm tăng đáng kể phạm vi, chi phí, quyền truy cập hoặc nghĩa vụ vận hành, áp dụng `GOV-DEC-001`. Không triển khai toàn bộ optional chỉ vì đã đọc một module.
+**CRITICAL khi xét một phương án OPTIONAL.** `OPTIONAL` không mặc nhiên là yêu cầu và không tạo nghĩa vụ hỏi người dùng. Chỉ triển khai khi plan yêu cầu hoặc domain đã bật theo `GOV-OPT-002`. Có bằng chứng rủi ro hoặc convention tương ứng mà plan không nói → ghi đề xuất vào report, không tự thêm; phương án làm tăng đáng kể phạm vi, chi phí, quyền truy cập hoặc nghĩa vụ vận hành → áp dụng `GOV-DEC-001`. Không triển khai toàn bộ optional chỉ vì đã đọc một module.
 
 ## GOV-OPT-002 — Optional by domain
 

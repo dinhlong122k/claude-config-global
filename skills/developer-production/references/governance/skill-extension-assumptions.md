@@ -40,7 +40,7 @@ Quy ước ID: `GOV-*` cho governance, `ARC-*` architecture, nhóm controls đan
 
 ## GOV-CAT-005 — CRITICAL và OPTIONAL có ý nghĩa thực thi
 
-**CRITICAL — cho mọi module mới hoặc sửa.** Một module được kích hoạt phải có phần `CRITICAL` và `OPTIONAL` rõ ràng. CRITICAL áp dụng khi trigger đúng; OPTIONAL là khả năng tạo thêm phạm vi, dependency, chi phí, rủi ro hoặc vận hành và chỉ được triển khai khi người dùng đồng ý rõ theo `GOV-OPT-001`. Không gán mặc định một optional vào feature, cũng không hạ yêu cầu an toàn bắt buộc thành optional để tránh hỏi.
+**CRITICAL — cho mọi module mới hoặc sửa.** Một module được kích hoạt phải có phần `CRITICAL` và `OPTIONAL` rõ ràng. CRITICAL áp dụng khi trigger đúng; OPTIONAL là khả năng tạo thêm phạm vi, dependency, chi phí, rủi ro hoặc vận hành và chỉ được triển khai theo `GOV-OPT-001` (plan đã duyệt yêu cầu, hoặc domain bật theo `GOV-OPT-002`). Không gán mặc định một optional vào feature, cũng không hạ yêu cầu an toàn bắt buộc thành optional để tránh hỏi.
 
 ## GOV-CAT-006 — Liên kết và điều hướng là một phần của thay đổi
 
@@ -103,7 +103,7 @@ Không chứa secret, endpoint/dữ liệu production hoặc giá trị cấu h�
 | Thêm một `SKILL.md` cho mỗi stack hoặc integration | Giữ một entrypoint; thêm reference/adapter/integration dưới package. |
 | Copy timeout, retry, error handling vào mọi integration | Owner là controls; integration chỉ link và nêu semantics đặc thù. |
 | Stack adapter ép dự án dùng framework/SDK mới | Chỉ hướng dẫn idiom cho stack đã có; nêu lựa chọn để chốt nếu cần đổi dependency. |
-| Tạo optional nhưng tự bật vì “best practice” | Hỏi và chờ đồng ý rõ theo `GOV-OPT-001`. |
+| Tạo optional nhưng tự bật vì “best practice” | Chỉ bật khi plan yêu cầu theo `GOV-OPT-001`; ngoài plan thì đề xuất trong report. |
 | Thêm vendor mà chưa biết protocol/boundary | Brainstorm, chốt `DEC-...`, sau đó mới chọn reference và folder. |
 | Đặt snippet SDK vào rule và để agent copy số timeout/retry/TTL | Giữ rule là contract; chỉ tạo reference có version/test khi nó chứng minh được rủi ro kỹ thuật cụ thể. |
 | Gọi fixture/template dùng chung là “best practice” rồi tự thêm | Xem là OPTIONAL; chốt consumer, owner, lifecycle và sự đồng ý trước. |
